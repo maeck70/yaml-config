@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
 )
 
@@ -18,7 +19,7 @@ import (
 //
 // Returns:
 // - A map representation of the configuration.
-func LoadConfig(file string, customStruct interface{}) map[string]interface{} {
+func LoadConfig(file string, customStruct interface{}) any { // map[string]interface{} {
 	// Read the file
 	data, err := os.ReadFile(file)
 	if err != nil {
@@ -49,7 +50,11 @@ func LoadConfig(file string, customStruct interface{}) map[string]interface{} {
 
 	cv.validateConfig(configStruct)
 
-	return configStruct.Data.(map[string]interface{})
+	// Convert the map structure back to the original struct
+	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
+	mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
+	return res
+	//return configStruct.Data.(map[string]interface{})
 }
 
 // loadConfigFromString unmarshals a YAML configuration string into a Config_t struct.
