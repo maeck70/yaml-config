@@ -9,6 +9,10 @@ This is the README file for the `yamlconfig` package, which provides functionali
 - Handles missing attributes and sets default values if provided in the schema.
 - Provides detailed error messages for invalid configuration.
 
+**Example**
+
+A working example of using this module can be found here [https://github.com/maeck70/yaml-config-example].
+
 **Installation:**
 
 1. Clone this repository.
