@@ -22,6 +22,10 @@ A working example of using this module can be found here [https://github.com/mae
 
 1.  Import the package:
 
+    ```
+    go get github.com/maeck70/yaml-config
+    ```
+
     ```go
     import "github.com/maeck70/yamlconfig"
     ```
