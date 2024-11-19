@@ -79,7 +79,7 @@ func LoadConfig(file string, customStruct interface{}) any {
 		)
 	}
 
-	schema.validateConfig(customStruct)
+	schema.validateConfig(configStruct)
 
 	// Convert the map structure back to the original struct
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
@@ -94,11 +94,9 @@ func LoadConfig(file string, customStruct interface{}) any {
 //
 // Returns:
 // - An error if validation fails.
-func (cv ConfigValidator_t) validateConfig(c interface{}) error {
+func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 	errors := []error{}
-
-	//convert c as a struct{} tp map[string]interface{}
-	data := c.(map[string]interface{})
+	data := c.Data.(map[string]interface{})
 
 	// Add missing attributes and default them
 	cvo := cv.Schema
