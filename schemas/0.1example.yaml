@@ -1,0 +1,52 @@
+metadata:
+  schema_version: 0.1example
+  id: ExampleConfig
+  
+schema:
+  Name:
+    type: string
+    description: Name of the user
+    required: true
+  City:
+    type: string
+    description: City of the user
+    required: true
+  State:
+    type: string
+    description: State of the user
+    required: true
+  Id:
+    type: integer
+    description: Unique identifier
+    required: false
+    min: 100
+    max: 200    
+  Options:
+    type: array
+    description: List of options
+    optiontype: string
+    required: false
+  Rabbitmq:
+    type: object
+    description: Rabbitmq configuration
+    attributes:
+      host:
+        type: string
+        description: Hostname
+        required: true
+      port:
+        type: integer
+        description: Port number
+        default: 5672
+      user:
+        type: string
+        description: Username
+        required: true 
+      password:
+        type: string
+        description: Password
+        required: true
+      vhost:
+        type: string
+        description: Virtual host
+        default: /

@@ -1,0 +1,113 @@
+metadata:
+  schema_version: 0.1alpha
+  id: TwistyGo_Orchestrator_Workflow
+
+schema:
+  id:
+    type: string
+    description: Unique identifier for the workflow
+    required: true
+  schema_version:
+    type: string
+    description: Version of the schema
+    required: true
+  name:
+    type: string
+    description: Name of the workflow
+    required: true
+  description:
+    type: string
+    description: Description of the workflow
+    required: false
+  version:
+    type: string
+    description: Version of the workflow
+    required: false
+
+  initiate:
+    type: array
+    description: List of paths to initiate
+    items:
+      type: string
+      description: Path to initiate
+      required: true
+
+  twisty-services:
+    type: object
+    description: List of TwistyGo Services
+    attributes:
+      ServiceName:
+        type: object
+        description: A Service
+        attributes:
+          queue:
+            type: string
+            description: Queue name
+            required: true
+          exchange:
+            type: string
+            description: Exchange name
+            required: true
+          routingkey:
+            type: string
+            description: Routing key
+            required: true
+
+  paths:
+    type: object
+    description: List of Paths
+    attributes:
+      PathName:
+        type: object
+        description: A Path
+        attributes:
+          description:
+            type: string
+            description: Description of the path
+            required: true
+          type:
+            type: string
+            description: Type of path
+            required: true
+          firststep:
+            type: string
+            description: First step in the path
+            required: true
+          steps:
+            type: object
+            description: List of Steps
+            attributes:
+              StepName:
+                type: object
+                description: A Step
+                attributes:
+                  description:
+                    type: string
+                    description: Description of the step
+                    required: true
+                  type:
+                    type: string
+                    description: Type of step
+                    required: true
+                  command:
+                    type: string
+                    description: Command to execute
+                    required: true
+                  timeout:
+                    type: string
+                    description: Timeout for the step
+                    required: true
+                  next:
+                    type: array
+                    description: Next steps
+                    items:
+                      type: object
+                      attributes:
+                        step:
+                          type: string
+                          description: Next step
+                          required: true
+                        branch:
+                          type: string
+                          description: Branch to take
+                          required: false
