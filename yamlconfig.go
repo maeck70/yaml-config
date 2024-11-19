@@ -26,41 +26,44 @@ var schemaDir embed.FS
 func LoadConfig(file string, customStruct interface{}) any {
 
 	// Load the workflow from the yaml file
-	wfdata, err := os.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatalf("error reading file: %v", err)
 	}
 
-	wfmeta := Metadata_t{}
-	err = yaml.Unmarshal(wfdata, &wfmeta)
+	datameta := Metadata_t{}
+	err = yaml.Unmarshal(data, &datameta)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 
-	if wfmeta.Id != "TwistyGo_Orchestrator_Workflow" {
-		log.Fatalf("Invalid workflow schema file, schema should contain id: TwistyGo_Orchestrator_Workflow")
-	}
-
 	// If the schema definition file (schema_version) does not exist, we dont support it
-	sdata, err := schemaDir.ReadFile("workflow.schema/" + wfmeta.SchemaVersion + ".yaml")
+	schemadata, err := schemaDir.ReadFile("workflow.schema/" + datameta.SchemaVersion + ".yaml")
 	if err != nil {
-		log.Fatalf("Schema version %s is not supported in file %s", wfmeta.SchemaVersion, file)
+		log.Fatalf("Schema version %s is not supported in file %s", datameta.SchemaVersion, file)
 	}
 
 	// Unmarshal the workflow schema
-	err = yaml.Unmarshal(wfdata, customStruct)
+	err = yaml.Unmarshal(data, customStruct)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 
 	// Unmarshal the validation schema
 	schema := ConfigValidator_t{}
-	err = yaml.Unmarshal(sdata, &schema)
+	err = yaml.Unmarshal(schemadata, &schema)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	if schema.Metadata.SchemaVersion != wfmeta.SchemaVersion {
-		log.Fatalf("Workflow schema version %s does not match internal schema validator %s", wfmeta.SchemaVersion, schema.Metadata.SchemaVersion)
+
+	// Check if the schema id matches the workflow id
+	if datameta.Id != schema.Metadata.Id {
+		log.Fatalf("Invalid workflow schema file, schema should contain id: %s", schema.Metadata.Id)
+	}
+
+	// Check if the schema version matches the internal schema validator
+	if schema.Metadata.SchemaVersion != datameta.SchemaVersion {
+		log.Fatalf("Workflow schema version %s does not match internal schema validator %s", datameta.SchemaVersion, schema.Metadata.SchemaVersion)
 	}
 
 	schema.validateConfig(customStruct)
