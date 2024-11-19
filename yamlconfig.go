@@ -32,7 +32,7 @@ func LoadConfig(file string, customStruct interface{}) any { // map[string]inter
 
 	// Check if data is a pointer
 	if dataStruct.Kind() == reflect.Ptr {
-		configStruct.Data = dataStruct.Elem()
+		configStruct.Schema = dataStruct.Elem()
 	} else {
 		return nil
 	}
@@ -43,7 +43,7 @@ func LoadConfig(file string, customStruct interface{}) any { // map[string]inter
 	}
 
 	cv := &ConfigValidator_t{}
-	err = cv.loadSchemaFromFile(configStruct.Metadata.Schema)
+	err = cv.loadSchemaFromFile(configStruct.Metadata.SchemaVersion)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -52,7 +52,7 @@ func LoadConfig(file string, customStruct interface{}) any { // map[string]inter
 
 	// Convert the map structure back to the original struct
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-	mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
+	mapstructure.Decode(configStruct.Schema.(map[string]interface{}), &res)
 	return res
 	//return configStruct.Data.(map[string]interface{})
 }
@@ -71,7 +71,7 @@ func loadConfigFromString(configStr []byte, c *Config_t) error {
 		return fmt.Errorf("error unmarshalling YAML: %v", err)
 	}
 
-	if c.Metadata.Schema == "" {
+	if c.Metadata.SchemaVersion == "" {
 		return fmt.Errorf("schema not defined in metadata")
 	}
 
@@ -124,7 +124,7 @@ func (cv *ConfigValidator_t) loadSchemaFromString(schemaStr []byte) error {
 // - An error if validation fails.
 func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 	errors := []error{}
-	data := c.Data.(map[string]interface{})
+	data := c.Schema.(map[string]interface{})
 
 	// Add missing attributes and default them
 	cvo := cv.Schema
