@@ -1,14 +1,16 @@
 package yamlconfig
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 
-	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
 )
+
+//go:embed workflow.schema/*.yaml
+var schemaDir embed.FS
 
 // LoadConfig reads a YAML configuration file and loads it into a custom struct.
 // It returns a map representation of the configuration.
@@ -19,42 +21,83 @@ import (
 //
 // Returns:
 // - A map representation of the configuration.
-func LoadConfig(file string, customStruct interface{}) any { // map[string]interface{} {
-	// Read the file
-	data, err := os.ReadFile(file)
+func LoadConfig(file string, wf *interface{}) {
+
+	// Load the workflow from the yaml file
+	wfdata, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatalf("error reading file: %v", err)
 	}
 
-	// Build the full config struct
-	dataStruct := reflect.ValueOf(customStruct)
-	configStruct := &Config_t{}
-
-	// Check if data is a pointer
-	if dataStruct.Kind() == reflect.Ptr {
-		configStruct.Schema = dataStruct.Elem()
-	} else {
-		return nil
-	}
-
-	err = loadConfigFromString(data, configStruct)
+	wfmeta := Metadata_t{}
+	err = yaml.Unmarshal(wfdata, &wfmeta)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("error: %v", err)
 	}
 
-	cv := &ConfigValidator_t{}
-	err = cv.loadSchemaFromFile(configStruct.Metadata.SchemaVersion)
+	if wfmeta.Id != "TwistyGo_Orchestrator_Workflow" {
+		log.Fatalf("Invalid workflow schema file, schema shoud contain id: TwistyGo_Orchestrator_Workflow")
+	}
+
+	// If the schema definition file (schema_version) does not exist, we dont support it
+	sdata, err := schemaDir.ReadFile("workflow.schema/" + wfmeta.SchemaVersion + ".yaml")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Schema version %s is not supported in file %s", wfmeta.SchemaVersion, file)
 	}
 
-	cv.validateConfig(configStruct)
+	// Unmarshal the workflow schema
+	err = yaml.Unmarshal(wfdata, wf)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 
-	// Convert the map structure back to the original struct
-	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-	mapstructure.Decode(configStruct.Schema.(map[string]interface{}), &res)
-	return res
-	//return configStruct.Data.(map[string]interface{})
+	// Unmarshal the validation schema
+	schema := Config_t{}
+	err = yaml.Unmarshal(sdata, &schema)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	if schema.Metadata.SchemaVersion != wfmeta.SchemaVersion {
+		log.Fatalf("Workflow schema version %s does not match internal schema validator %s", wfmeta.SchemaVersion, schema.Metadata.SchemaVersion)
+	}
+
+	/*
+		// Read the file
+		data, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("error reading file: %v", err)
+		}
+
+		// Build the full config struct
+		dataStruct := reflect.ValueOf(customStruct)
+		configStruct := &Config_t{}
+
+		// Check if data is a pointer
+		if dataStruct.Kind() == reflect.Ptr {
+			configStruct.Schema = dataStruct.Elem()
+		} else {
+			return nil
+		}
+
+		err = loadConfigFromString(data, configStruct)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		cv := &ConfigValidator_t{}
+		err = cv.loadSchemaFromFile(configStruct.Metadata.SchemaVersion)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		cv.validateConfig(configStruct)
+
+		// Convert the map structure back to the original struct
+		res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
+		mapstructure.Decode(configStruct.Schema.(map[string]interface{}), &res)
+		return res
+		//return configStruct.Data.(map[string]interface{})
+	*/
 }
 
 // loadConfigFromString unmarshals a YAML configuration string into a Config_t struct.
