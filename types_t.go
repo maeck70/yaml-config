@@ -16,7 +16,8 @@ type sf_t map[string]SchemaField_t
 
 // Validation Schema
 type ConfigValidator_t struct {
-	Schema sf_t `yaml:"schema"`
+	Metadata Metadata_t `yaml:"metadata"`
+	Schema   sf_t       `yaml:"schema"`
 }
 
 // Schema Field

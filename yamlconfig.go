@@ -52,7 +52,7 @@ func LoadConfig(file string, wf interface{}) {
 	}
 
 	// Unmarshal the validation schema
-	schema := Config_t{}
+	schema := ConfigValidator_t{}
 	err = yaml.Unmarshal(sdata, &schema)
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -61,43 +61,7 @@ func LoadConfig(file string, wf interface{}) {
 		log.Fatalf("Workflow schema version %s does not match internal schema validator %s", wfmeta.SchemaVersion, schema.Metadata.SchemaVersion)
 	}
 
-	/*
-		// Read the file
-		data, err := os.ReadFile(file)
-		if err != nil {
-			log.Fatalf("error reading file: %v", err)
-		}
-
-		// Build the full config struct
-		dataStruct := reflect.ValueOf(customStruct)
-		configStruct := &Config_t{}
-
-		// Check if data is a pointer
-		if dataStruct.Kind() == reflect.Ptr {
-			configStruct.Schema = dataStruct.Elem()
-		} else {
-			return nil
-		}
-
-		err = loadConfigFromString(data, configStruct)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		cv := &ConfigValidator_t{}
-		err = cv.loadSchemaFromFile(configStruct.Metadata.SchemaVersion)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		cv.validateConfig(configStruct)
-
-		// Convert the map structure back to the original struct
-		res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-		mapstructure.Decode(configStruct.Schema.(map[string]interface{}), &res)
-		return res
-		//return configStruct.Data.(map[string]interface{})
-	*/
+	schema.validateConfig(wf.(Config_t))
 }
 
 // loadConfigFromString unmarshals a YAML configuration string into a Config_t struct.
@@ -165,7 +129,7 @@ func (cv *ConfigValidator_t) loadSchemaFromString(schemaStr []byte) error {
 //
 // Returns:
 // - An error if validation fails.
-func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
+func (cv ConfigValidator_t) validateConfig(c Config_t) error {
 	errors := []error{}
 	data := c.Schema.(map[string]interface{})
 
