@@ -2,12 +2,13 @@ package yamlconfig
 
 // Base config structure
 type Config_t struct {
-	Metadata metadata_t  `yaml:"metadata"`
+	Metadata Metadata_t  `yaml:"metadata"`
 	Data     interface{} `yaml:"data"`
 }
 
 // Metadata for the config file
-type metadata_t struct {
+type Metadata_t struct {
+	Id     string `yaml:"id"`
 	Schema string `yaml:"schema"`
 }
 
