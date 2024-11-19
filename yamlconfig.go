@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 
+	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,7 +23,7 @@ var schemaDir embed.FS
 //
 // Returns:
 // - A map representation of the configuration.
-func LoadConfig(file string, wf interface{}) {
+func LoadConfig(file string, customStruct interface{}) any {
 
 	// Load the workflow from the yaml file
 	wfdata, err := os.ReadFile(file)
@@ -46,7 +48,7 @@ func LoadConfig(file string, wf interface{}) {
 	}
 
 	// Unmarshal the workflow schema
-	err = yaml.Unmarshal(wfdata, wf)
+	err = yaml.Unmarshal(wfdata, customStruct)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -61,53 +63,12 @@ func LoadConfig(file string, wf interface{}) {
 		log.Fatalf("Workflow schema version %s does not match internal schema validator %s", wfmeta.SchemaVersion, schema.Metadata.SchemaVersion)
 	}
 
-	wfMap, ok := wf.(map[string]interface{})
-	if !ok {
-		log.Fatalf("error: wf is not of type map[string]interface{}")
-	}
-	schema.validateConfig(wfMap)
-}
+	schema.validateConfig(customStruct)
 
-// loadConfigFromString unmarshals a YAML configuration string into a Config_t struct.
-//
-// Parameters:
-// - configStr: The YAML configuration string.
-// - c: A pointer to the Config_t struct where the configuration will be loaded.
-//
-// Returns:
-// - An error if unmarshalling fails or if the schema is not defined in metadata.
-func loadConfigFromString(configStr []byte, c *Config_t) error {
-	err := yaml.Unmarshal(configStr, c)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling YAML: %v", err)
-	}
-
-	if c.Metadata.SchemaVersion == "" {
-		return fmt.Errorf("schema not defined in metadata")
-	}
-
-	return nil
-}
-
-// loadSchemaFromFile reads a YAML schema file and loads it into the ConfigValidator_t struct.
-//
-// Parameters:
-// - file: The path to the YAML schema file.
-//
-// Returns:
-// - An error if reading the file or unmarshalling the schema fails.
-func (cv *ConfigValidator_t) loadSchemaFromFile(file string) error {
-	// Read the file
-	data, err := os.ReadFile(file)
-	if err != nil {
-		return fmt.Errorf("error reading file: %v", err)
-	}
-	err = cv.loadSchemaFromString(data)
-	if err != nil {
-		return fmt.Errorf("error loading schema: %v", err)
-	}
-
-	return nil
+	// Convert the map structure back to the original struct
+	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
+	mapstructure.Decode(customStruct.Data.(map[string]interface{}), &res)
+	return res
 }
 
 // loadSchemaFromString unmarshals a YAML schema string into the ConfigValidator_t struct.
@@ -133,9 +94,11 @@ func (cv *ConfigValidator_t) loadSchemaFromString(schemaStr []byte) error {
 //
 // Returns:
 // - An error if validation fails.
-func (cv ConfigValidator_t) validateConfig(data map[string]interface{}) error {
+func (cv ConfigValidator_t) validateConfig(c interface{}) error {
 	errors := []error{}
-	//data := c.(map[string]interface{})
+
+	//convert c as a struct{} tp map[string]interface{}
+	data := c.(map[string]interface{})
 
 	// Add missing attributes and default them
 	cvo := cv.Schema
