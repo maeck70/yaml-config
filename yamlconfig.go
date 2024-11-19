@@ -61,7 +61,7 @@ func LoadConfig(file string, wf interface{}) {
 		log.Fatalf("Workflow schema version %s does not match internal schema validator %s", wfmeta.SchemaVersion, schema.Metadata.SchemaVersion)
 	}
 
-	schema.validateConfig(wf.(Config_t))
+	schema.validateConfig(wf)
 }
 
 // loadConfigFromString unmarshals a YAML configuration string into a Config_t struct.
@@ -129,9 +129,9 @@ func (cv *ConfigValidator_t) loadSchemaFromString(schemaStr []byte) error {
 //
 // Returns:
 // - An error if validation fails.
-func (cv ConfigValidator_t) validateConfig(c Config_t) error {
+func (cv ConfigValidator_t) validateConfig(c interface{}) error {
 	errors := []error{}
-	data := c.Schema.(map[string]interface{})
+	data := c.(map[string]interface{})
 
 	// Add missing attributes and default them
 	cvo := cv.Schema
