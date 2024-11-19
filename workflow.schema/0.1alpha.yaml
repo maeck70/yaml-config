@@ -1,5 +1,7 @@
 metadata:
   schema_version: 0.1alpha
+  id: TwistyGo_Orchestrator_Workflow
+
 schema:
   id:
     type: string

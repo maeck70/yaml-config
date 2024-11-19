@@ -1,20 +1,20 @@
 package yamlconfig
 
-// Base config structure
-type Config_t struct {
-	Metadata Metadata_t  `yaml:"metadata"`
-	Data     interface{} `yaml:"data"`
-}
-
-// Metadata for the config file
+// Metadata for the config and schema file
 type Metadata_t struct {
 	Id            string `yaml:"id"`
 	SchemaVersion string `yaml:"schema_version"`
 }
 
+// Base Config structure
+type Config_t struct {
+	Metadata Metadata_t  `yaml:"metadata"`
+	Data     interface{} `yaml:"data"`
+}
+
 type sf_t map[string]SchemaField_t
 
-// Validation Schema
+// Base Validation Schema
 type ConfigValidator_t struct {
 	Metadata Metadata_t `yaml:"metadata"`
 	Schema   sf_t       `yaml:"schema"`
