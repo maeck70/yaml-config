@@ -55,7 +55,7 @@ func LoadConfig(file string, customStruct interface{}) any {
 	}
 
 	// Unmarshal the config schema
-	err = yaml.Unmarshal(data, customStruct)
+	err = yaml.Unmarshal(data, configStruct)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -68,14 +68,14 @@ func LoadConfig(file string, customStruct interface{}) any {
 	}
 
 	// Check if the schema id matches the workflow id
-	if datameta.Metadata.Id != schema.Metadata.Id {
-		log.Fatalf("Invalid workflow schema file, schema should contain id: %s", schema.Metadata.Id)
+	if datameta.Metadata.Id != configStruct.Metadata.Id {
+		log.Fatalf("Invalid workflow schema file, schema should contain id: %s", configStruct.Metadata.Id)
 	}
 
 	// Check if the schema version matches the internal schema validator
 	if schema.Metadata.SchemaVersion != datameta.Metadata.SchemaVersion {
 		log.Fatalf("Workflow schema version %s does not match internal schema validator %s",
-			datameta.Metadata.SchemaVersion, schema.Metadata.SchemaVersion,
+			datameta.Metadata.SchemaVersion, configStruct.Metadata.SchemaVersion,
 		)
 	}
 
