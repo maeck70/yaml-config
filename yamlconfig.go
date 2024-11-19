@@ -156,13 +156,42 @@ func addMissingAttr(ks string, vs SchemaField_t, data map[string]interface{}) {
 	}
 }
 
+func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
+	if vs.Default == nil {
+		switch vs.Type {
+		case "string":
+			data[i] = ""
+		case "integer":
+			if vs.Min != 0 {
+				data[i] = int(vs.Min)
+			} else {
+				data[i] = 0
+			}
+		case "float":
+			if vs.Min != 0 {
+				data[i] = float64(vs.Min)
+			} else {
+				data[i] = 0.0
+			}
+		case "boolean":
+			data[i] = false
+		case "array":
+			data[i] = []interface{}{}
+		case "object":
+			data[i] = map[string]interface{}{}
+		default:
+			log.Fatalf("field %s has an unknown type", i)
+		}
+	}
+}
+
 // recurValidateConfig recursively validates the configuration data against the schema
 // for nested objects.
 //
 // Parameters:
 // - data: The configuration data map.
 // - e: A slice of errors to collect validation errors.
-func (cv sf_t) recurValidateConfig(data map[string]interface{}, e []error) {
+func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []error) {
 	// Add any attributes that are not provided
 	for ks, vs := range cv {
 		switch vs.Type {
@@ -172,8 +201,38 @@ func (cv sf_t) recurValidateConfig(data map[string]interface{}, e []error) {
 			for _, datao := range data[ks].(map[string]interface{}) {
 				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
 			}
+		case "array":
+			// loop through the items in this object and add the missing items
+			cvo := cv[ks].Items
+			for _, datao := range data[ks].(map[string]interface{}) {
+				cvo.recurValidateConfig(datao.([]interface{}), e)
+			}
+
 		default:
 			addMissingAttr(ks, vs, data)
+		}
+	}
+}
+
+func (cv sfitem_t) recurValidateConfig(data []interface{}, e []error) {
+	// Add any attributes that are not provided
+	for i, vs := range cv {
+		switch vs.Type {
+		case "object":
+			// loop through the attributes in this object and add the missing attributes
+			cvo := cv[i].Attributes
+			for _, datao := range data[i].(map[string]interface{}) {
+				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
+			}
+		case "array":
+			// loop through the items in this object and add the missing items
+			cvo := cv[i].Items
+			for _, datao := range data[i].(map[string]interface{}) {
+				cvo.recurValidateConfig(datao.([]interface{}), e)
+			}
+
+		default:
+			addMissingItem(i, vs, data)
 		}
 	}
 }
