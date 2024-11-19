@@ -72,7 +72,7 @@ func LoadConfig(file string, customStruct interface{}) any {
 
 	// Convert the map structure back to the original struct
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-	mapstructure.Decode(customStruct.(map[string]interface{}), &res)
+	mapstructure.Decode(customStruct.Data.(map[string]interface{}), &res)
 	return res
 }
 
