@@ -31,16 +31,16 @@ func LoadConfig(file string, customStruct interface{}) any {
 		log.Fatalf("error reading file: %v", err)
 	}
 
-	datameta := Metadata_t{}
+	datameta := Config_t{}
 	err = yaml.Unmarshal(data, &datameta)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 
 	// If the schema definition file (schema_version) does not exist, we dont support it
-	schemadata, err := schemaDir.ReadFile("schemas/" + datameta.SchemaVersion + ".yaml")
+	schemadata, err := schemaDir.ReadFile("schemas/" + datameta.Metadata.SchemaVersion + ".yaml")
 	if err != nil {
-		log.Fatalf("Schema version %s is not supported in file %s", datameta.SchemaVersion, file)
+		log.Fatalf("Schema version %s is not supported in file %s", datameta.Metadata.SchemaVersion, file)
 	}
 
 	// Unmarshal the workflow schema
@@ -57,13 +57,15 @@ func LoadConfig(file string, customStruct interface{}) any {
 	}
 
 	// Check if the schema id matches the workflow id
-	if datameta.Id != schema.Metadata.Id {
+	if datameta.Metadata.Id != schema.Metadata.Id {
 		log.Fatalf("Invalid workflow schema file, schema should contain id: %s", schema.Metadata.Id)
 	}
 
 	// Check if the schema version matches the internal schema validator
-	if schema.Metadata.SchemaVersion != datameta.SchemaVersion {
-		log.Fatalf("Workflow schema version %s does not match internal schema validator %s", datameta.SchemaVersion, schema.Metadata.SchemaVersion)
+	if schema.Metadata.SchemaVersion != datameta.Metadata.SchemaVersion {
+		log.Fatalf("Workflow schema version %s does not match internal schema validator %s",
+			datameta.Metadata.SchemaVersion, schema.Metadata.SchemaVersion,
+		)
 	}
 
 	schema.validateConfig(customStruct)
