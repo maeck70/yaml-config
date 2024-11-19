@@ -38,7 +38,7 @@ func LoadConfig(file string, customStruct interface{}) any {
 	}
 
 	if wfmeta.Id != "TwistyGo_Orchestrator_Workflow" {
-		log.Fatalf("Invalid workflow schema file, schema shoud contain id: TwistyGo_Orchestrator_Workflow")
+		log.Fatalf("Invalid workflow schema file, schema should contain id: TwistyGo_Orchestrator_Workflow")
 	}
 
 	// If the schema definition file (schema_version) does not exist, we dont support it
