@@ -50,3 +50,9 @@ schema:
         type: string
         description: Virtual host
         default: /
+  MyArray:
+    type: array
+    description: List of paths
+    items:
+      type: string
+      description: Path
