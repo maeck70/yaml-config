@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed workflow.schema/*.yaml
+//go:embed schemas/*.yaml
 var schemaDir embed.FS
 
 // LoadConfig reads a YAML configuration file and loads it into a custom struct.
@@ -38,7 +38,7 @@ func LoadConfig(file string, customStruct interface{}) any {
 	}
 
 	// If the schema definition file (schema_version) does not exist, we dont support it
-	schemadata, err := schemaDir.ReadFile("workflow.schema/" + datameta.SchemaVersion + ".yaml")
+	schemadata, err := schemaDir.ReadFile("schemas/" + datameta.SchemaVersion + ".yaml")
 	if err != nil {
 		log.Fatalf("Schema version %s is not supported in file %s", datameta.SchemaVersion, file)
 	}
@@ -72,22 +72,6 @@ func LoadConfig(file string, customStruct interface{}) any {
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
 	mapstructure.Decode(customStruct.(map[string]interface{}), &res)
 	return res
-}
-
-// loadSchemaFromString unmarshals a YAML schema string into the ConfigValidator_t struct.
-//
-// Parameters:
-// - schemaStr: The YAML schema string.
-//
-// Returns:
-// - An error if unmarshalling the schema fails.
-func (cv *ConfigValidator_t) loadSchemaFromString(schemaStr []byte) error {
-	err := yaml.Unmarshal(schemaStr, cv)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling Schema YAML: %v", err)
-	}
-
-	return nil
 }
 
 // validateConfig validates the configuration against the schema.
