@@ -21,7 +21,7 @@ var schemaDir embed.FS
 //
 // Returns:
 // - A map representation of the configuration.
-func LoadConfig(file string, wf *interface{}) {
+func LoadConfig(file string, wf interface{}) {
 
 	// Load the workflow from the yaml file
 	wfdata, err := os.ReadFile(file)
