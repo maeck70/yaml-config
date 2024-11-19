@@ -180,7 +180,7 @@ func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
 		case "object":
 			data[i] = map[string]interface{}{}
 		default:
-			log.Fatalf("field %s has an unknown type", i)
+			log.Fatalf("item %d has an unknown type", i)
 		}
 	}
 }
@@ -194,22 +194,22 @@ func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
 func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []error) {
 	// Add any attributes that are not provided
 	for ks, vs := range cv {
-		switch vs.Type {
+		switch vs.(SchemaField_t).Type {
 		case "object":
 			// loop through the attributes in this object and add the missing attributes
-			cvo := cv[ks].Attributes
+			cvo := cv[ks].(SchemaField_t).Attributes
 			for _, datao := range data[ks].(map[string]interface{}) {
 				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
 			}
 		case "array":
 			// loop through the items in this object and add the missing items
-			cvo := cv[ks].Items
+			cvo := cv[ks].(SchemaField_t).Items
 			for _, datao := range data[ks].(map[string]interface{}) {
 				cvo.recurValidateConfig(datao.([]interface{}), e)
 			}
 
 		default:
-			addMissingAttr(ks, vs, data)
+			addMissingAttr(ks, vs.(SchemaField_t), data)
 		}
 	}
 }
@@ -217,22 +217,22 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 func (cv sfitem_t) recurValidateConfig(data []interface{}, e []error) {
 	// Add any attributes that are not provided
 	for i, vs := range cv {
-		switch vs.Type {
+		switch vs.(SchemaField_t).Type {
 		case "object":
 			// loop through the attributes in this object and add the missing attributes
-			cvo := cv[i].Attributes
+			cvo := cv[i].(SchemaField_t).Attributes
 			for _, datao := range data[i].(map[string]interface{}) {
 				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
 			}
 		case "array":
 			// loop through the items in this object and add the missing items
-			cvo := cv[i].Items
+			cvo := cv[i].(SchemaField_t).Items
 			for _, datao := range data[i].(map[string]interface{}) {
 				cvo.recurValidateConfig(datao.([]interface{}), e)
 			}
 
 		default:
-			addMissingItem(i, vs, data)
+			addMissingItem(i, vs.(SchemaField_t), data)
 		}
 	}
 }
@@ -245,7 +245,7 @@ func (cv sfitem_t) recurValidateConfig(data []interface{}, e []error) {
 func (cv ConfigValidator_t) checkAttr(data map[string]interface{}, e []error) {
 	// Check attribute values
 	for k, v := range data {
-		val := cv.Schema[k]
+		val := cv.Schema[k].(SchemaField_t)
 
 		// Check Required and use Default if not set
 		if val.Required && val.Default == nil && v == nil {

@@ -12,9 +12,11 @@ type Config_t struct {
 	Data     interface{} `yaml:"data"`
 }
 
-type sfattribute_t map[string]SchemaField_t
+type sfattribute_t map[string]interface{}
+type sfitem_t []interface{}
 
-type sfitem_t []SchemaField_t
+// type sfattribute_t map[string]SchemaField_t
+// type sfitem_t []SchemaField_t
 
 // Base Validation Schema
 type ConfigValidator_t struct {
