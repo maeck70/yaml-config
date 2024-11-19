@@ -25,6 +25,17 @@ var schemaDir embed.FS
 // - A map representation of the configuration.
 func LoadConfig(file string, customStruct interface{}) any {
 
+	// Build the full config struct
+	dataStruct := reflect.ValueOf(customStruct)
+	configStruct := &Config_t{}
+
+	// Check if data is a pointer
+	if dataStruct.Kind() == reflect.Ptr {
+		configStruct.Data = dataStruct.Elem()
+	} else {
+		return nil
+	}
+
 	// Load the workflow from the yaml file
 	data, err := os.ReadFile(file)
 	if err != nil {
@@ -43,7 +54,7 @@ func LoadConfig(file string, customStruct interface{}) any {
 		log.Fatalf("Schema version %s is not supported in file %s", datameta.Metadata.SchemaVersion, file)
 	}
 
-	// Unmarshal the workflow schema
+	// Unmarshal the config schema
 	err = yaml.Unmarshal(data, customStruct)
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -72,7 +83,7 @@ func LoadConfig(file string, customStruct interface{}) any {
 
 	// Convert the map structure back to the original struct
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-	mapstructure.Decode(customStruct.Data.(map[string]interface{}), &res)
+	mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
 	return res
 }
 
