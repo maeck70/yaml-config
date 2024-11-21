@@ -194,7 +194,7 @@ func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
 func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []error) {
 	// Add any attributes that are not provided
 	for ks, vs := range cv {
-		switch vs.(SchemaField_t).Type {
+		switch reflect.TypeOf(vs).String() {
 		case "object":
 			// loop through the attributes in this object and add the missing attributes
 			cvo := cv[ks].(SchemaField_t).Attributes
@@ -217,7 +217,7 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 func (cv sfitem_t) recurValidateConfig(data []interface{}, e []error) {
 	// Add any attributes that are not provided
 	for i, vs := range cv {
-		switch vs.(SchemaField_t).Type {
+		switch reflect.TypeOf(vs).String() {
 		case "object":
 			// loop through the attributes in this object and add the missing attributes
 			cvo := cv[i].(SchemaField_t).Attributes
