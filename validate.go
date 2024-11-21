@@ -13,10 +13,10 @@ func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 
 func (cv ConfigValidator_t) recurValidate(pad string, data interface{}) {
 	pad = pad + "  "
-	switch v := data.(type) {
+	switch val := data.(type) {
 	case map[string]interface{}:
-		for k, v := range v {
-			switch v.(type) {
+		for k, v := range val {
+			switch v := v.(type) {
 			case []interface{}:
 				log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
 				cv.recurValidate(pad, v)
@@ -25,12 +25,13 @@ func (cv ConfigValidator_t) recurValidate(pad string, data interface{}) {
 				cv.recurValidate(pad, v)
 			default:
 				log.Printf(pad+"Field - Key: %s, Value: %v\n", k, v)
-				cv.checkValue(pad, v)
+				value := val[k]
+				cv.checkValue(pad, &value)
 			}
 		}
 	case []interface{}:
-		for i, v := range v {
-			switch v.(type) {
+		for i, v := range val {
+			switch v := v.(type) {
 			case []interface{}:
 				log.Printf(pad+"List - %d, Value: %v\n", i, v)
 				cv.recurValidate(pad, v)
@@ -39,22 +40,24 @@ func (cv ConfigValidator_t) recurValidate(pad string, data interface{}) {
 				cv.recurValidate(pad, v)
 			default:
 				log.Printf(pad+"Field - %d, Value: %v\n", i, v)
-				cv.checkValue(pad, v)
+				cv.checkValue(pad, &val[i])
 			}
 		}
 	}
 }
 
-func (cv ConfigValidator_t) checkValue(pad string, v interface{}) {
-	switch v.(type) {
+func (cv ConfigValidator_t) checkValue(pad string, v *interface{}) {
+	switch val := (*v).(type) {
 	case string:
-		log.Printf(pad+"String: %s\n", v)
-		v = "new value"
+		log.Printf(pad+"String: %s\n", val)
+		*v = "new value"
 	case int:
-		log.Printf(pad+"Int: %d\n", v)
+		log.Printf(pad+"Int: %d\n", val)
+		*v = val + 1
 	case bool:
-		log.Printf(pad+"Bool: %t\n", v)
+		log.Printf(pad+"Bool: %t\n", val)
+		*v = !val
 	default:
-		log.Printf(pad+"Unknown: %v\n", v)
+		log.Printf(pad+"Unknown: %v\n", val)
 	}
 }
