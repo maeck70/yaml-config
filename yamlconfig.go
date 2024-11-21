@@ -198,11 +198,11 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 		log.Printf("- ks: %v vs: %+v", ks, vs)
 		log.Printf("  type: %s", reflect.TypeOf(vs).String())
 
-		switch vs.(type) {
+		switch vst := vs.(type) {
 		case map[string]interface{}:
 			log.Printf("  - map interface ks: %v", ks)
 			// call recurValidateConfig with the nested object
-			cv.recurValidateConfig(vs.(map[string]interface{}), e)
+			cv.recurValidateConfig(vst, e)
 
 		case []interface{}:
 			log.Printf("  - array interface ks: %v", ks)
