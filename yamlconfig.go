@@ -203,11 +203,18 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
 			}
 		case "array":
-			// loop through the items in this object and add the missing items
-			cvo := cv[ks].(SchemaField_t).Items
-			for _, datao := range data[ks].(map[string]interface{}) {
-				cvo.recurValidateConfig(datao.([]interface{}), e)
+			// loop through the attributes in this object and add the missing attributes
+			for _, datao := range vs.(sfattribute_t) {
+				cvo := datao.(sfattribute_t)
+				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
 			}
+			/*
+				// loop through the items in this object and add the missing items
+				cvo := cv[ks].(SchemaField_t).Items
+				for _, datao := range data[ks].(map[string]interface{}) {
+					cvo.recurValidateConfig(datao.([]interface{}), e)
+				}
+			*/
 		default:
 			sf := vs.(sfattribute_t)
 			addMissingAttr(ks, sf[ks].(SchemaField_t), data)
