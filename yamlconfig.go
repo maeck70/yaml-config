@@ -209,7 +209,8 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 				cvo.recurValidateConfig(datao.([]interface{}), e)
 			}
 		default:
-			addMissingAttr(ks, vs.(SchemaField_t), data)
+			sf := vs.(sfattribute_t)
+			addMissingAttr(ks, sf[ks].(SchemaField_t), data)
 		}
 	}
 }
