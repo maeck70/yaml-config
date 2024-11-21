@@ -198,8 +198,8 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 		switch reflect.TypeOf(vs).String() {
 		case "yamlconfig.sfattribute_t":
 			// loop through the attributes in this object and add the missing attributes
-			for _, datao := range vs.(map[string]interface{}) {
-				cvo := vs.(sfattribute_t)
+			for _, datao := range vs.(sfattribute_t) {
+				cvo := datao.(sfattribute_t)
 				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
 			}
 		case "yamlconfig.sfitem_t":
