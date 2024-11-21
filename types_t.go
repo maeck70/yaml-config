@@ -12,7 +12,6 @@ type Config_t struct {
 	Data     interface{} `yaml:"data"`
 }
 
-type sfattribute_t map[string]interface{}
 type sfitem_t []interface{}
 type Schema_t map[string]SchemaField_t
 
@@ -24,16 +23,15 @@ type ConfigValidator_t struct {
 
 // Schema Field
 type SchemaField_t struct {
-	Type        string `yaml:"type"`
-	Description string `yaml:"description"`
-	Required    bool   `yaml:"required"`
-	Default     any    `yaml:"default"`
-	Options     []any  `yaml:"options"`
-	OptionType  string `yaml:"optiontype"`
-	Min         int64  `yaml:"min"`
-	Max         int64  `yaml:"max"`
-	// Attributes  sfattribute_t `yaml:"attributes"`
-	Attributes Schema_t `yaml:"attributes"`
-	Items      sfitem_t `yaml:"items"`
-	Valid      []string `yaml:"valid"`
+	Type        string   `yaml:"type"`
+	Description string   `yaml:"description"`
+	Required    bool     `yaml:"required"`
+	Default     any      `yaml:"default"`
+	Options     []any    `yaml:"options"`
+	OptionType  string   `yaml:"optiontype"`
+	Min         int64    `yaml:"min"`
+	Max         int64    `yaml:"max"`
+	Attributes  Schema_t `yaml:"attributes"`
+	Items       sfitem_t `yaml:"items"`
+	Valid       []string `yaml:"valid"`
 }
