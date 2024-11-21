@@ -14,23 +14,26 @@ type Config_t struct {
 
 type sfattribute_t map[string]interface{}
 type sfitem_t []interface{}
+type Schema_t map[string]SchemaField_t
 
 // Base Validation Schema
 type ConfigValidator_t struct {
-	Metadata Metadata_t               `yaml:"metadata"`
-	Schema   map[string]SchemaField_t `yaml:"schema"`
+	Metadata Metadata_t `yaml:"metadata"`
+	Schema   Schema_t   `yaml:"schema"`
 }
 
 // Schema Field
 type SchemaField_t struct {
-	Type        string        `yaml:"type"`
-	Description string        `yaml:"description"`
-	Required    bool          `yaml:"required"`
-	Default     any           `yaml:"default"`
-	Options     []any         `yaml:"options"`
-	OptionType  string        `yaml:"optiontype"`
-	Min         int64         `yaml:"min"`
-	Max         int64         `yaml:"max"`
-	Attributes  sfattribute_t `yaml:"attributes"`
-	Items       sfitem_t      `yaml:"items"`
+	Type        string `yaml:"type"`
+	Description string `yaml:"description"`
+	Required    bool   `yaml:"required"`
+	Default     any    `yaml:"default"`
+	Options     []any  `yaml:"options"`
+	OptionType  string `yaml:"optiontype"`
+	Min         int64  `yaml:"min"`
+	Max         int64  `yaml:"max"`
+	// Attributes  sfattribute_t `yaml:"attributes"`
+	Attributes Schema_t `yaml:"attributes"`
+	Items      sfitem_t `yaml:"items"`
+	Valid      []string `yaml:"valid"`
 }

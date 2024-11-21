@@ -7,9 +7,10 @@ metadata:
 data:
   Name: Marcel
   City: Walnut Creek
-  Id: 1230
+  Id: 123
+  State: CA
   Options:
-    - Foo
+    - foo
     - Bar
   Rabbitmq:
     main:
