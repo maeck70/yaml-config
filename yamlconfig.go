@@ -103,7 +103,7 @@ func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 	cvo.recurValidateConfig(data, errors)
 
 	// Check validity of the attributes
-	cv.checkAttr(data, errors)
+	// cv.checkAttr(data, errors)
 
 	// Check and report errors
 	if len(errors) != 0 {
@@ -191,7 +191,7 @@ func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
 // Parameters:
 // - data: The configuration data map.
 // - e: A slice of errors to collect validation errors.
-func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []error) {
+func (cv SchemaField_t) recurValidateConfig(data map[string]interface{}, e []error) {
 	// Add any attributes that are not provided
 	for ks, vs := range data {
 
@@ -208,7 +208,7 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 
 		default:
 			log.Printf("  - other ks: %v %v", ks, vst)
-			addMissingAttr(ks, cv[ks].(SchemaField_t), data)
+			addMissingAttr(ks, cv, data)
 		}
 
 		/*
@@ -237,6 +237,7 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 	}
 }
 
+/*
 // checkAttr checks the attribute values in the configuration data against the schema.
 //
 // Parameters:
@@ -245,7 +246,7 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 func (cv ConfigValidator_t) checkAttr(data map[string]interface{}, e []error) {
 	// Check attribute values
 	for k, v := range data {
-		val := cv.Schema[k].(SchemaField_t)
+		val := cv.Schema[k].(map[string]interface{})
 
 		// Check Required and use Default if not set
 		if val.Required && val.Default == nil && v == nil {
@@ -317,3 +318,4 @@ func (cv ConfigValidator_t) checkAttr(data map[string]interface{}, e []error) {
 		}
 	}
 }
+*/

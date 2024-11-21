@@ -21,7 +21,7 @@ type sfitem_t []interface{}
 // Base Validation Schema
 type ConfigValidator_t struct {
 	Metadata Metadata_t    `yaml:"metadata"`
-	Schema   sfattribute_t `yaml:"schema"`
+	Schema   SchemaField_t `yaml:"schema"`
 }
 
 // Schema Field
