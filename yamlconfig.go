@@ -194,8 +194,8 @@ func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
 func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []error) {
 	// Add any attributes that are not provided
 	for ks, vs := range cv {
-		t := reflect.TypeOf(vs).String()
-		switch t {
+		// check the type of vs
+		switch reflect.TypeOf(vs).String() {
 		case "yamlconfig.sfattribute_t":
 			// loop through the attributes in this object and add the missing attributes
 			cvo := cv[ks].(SchemaField_t).Attributes
@@ -208,7 +208,6 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 			for _, datao := range data[ks].(map[string]interface{}) {
 				cvo.recurValidateConfig(datao.([]interface{}), e)
 			}
-
 		default:
 			addMissingAttr(ks, vs.(SchemaField_t), data)
 		}
