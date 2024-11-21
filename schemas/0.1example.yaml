@@ -82,6 +82,8 @@ schema:
   MyArray:
     type: array
     description: List of paths
-    items:
-      type: string
-      description: Path
+    list:
+      attributes:
+        path:
+          type: string
+          description: Path

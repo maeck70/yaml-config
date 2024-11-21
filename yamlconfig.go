@@ -1,13 +1,13 @@
 package yamlconfig
 
 import (
-    "embed"
-    "log"
-    "os"
-    "reflect"
+	"embed"
+	"log"
+	"os"
+	"reflect"
 
-    "github.com/mitchellh/mapstructure"
-    "gopkg.in/yaml.v3"
+	"github.com/mitchellh/mapstructure"
+	"gopkg.in/yaml.v3"
 )
 
 //go:embed schemas/*.yaml
@@ -24,103 +24,119 @@ var schemaDir embed.FS
 // - A map representation of the configuration.
 func LoadConfig(file string, customStruct interface{}) any {
 
-    // Build the full config struct
-    dataStruct := reflect.ValueOf(customStruct)
-    configStruct := &Config_t{}
+	// Build the full config struct
+	dataStruct := reflect.ValueOf(customStruct)
+	configStruct := &Config_t{}
 
-    // Check if data is a pointer
-    if dataStruct.Kind() == reflect.Ptr {
-        configStruct.Data = dataStruct.Elem()
-    } else {
-        return nil
-    }
+	// Check if data is a pointer
+	if dataStruct.Kind() == reflect.Ptr {
+		configStruct.Data = dataStruct.Elem()
+	} else {
+		return nil
+	}
 
-    // Load the workflow from the yaml file
-    data, err := os.ReadFile(file)
-    if err != nil {
-        log.Fatalf("error reading file: %v", err)
-    }
+	// Load the workflow from the yaml file
+	data, err := os.ReadFile(file)
+	if err != nil {
+		log.Fatalf("error reading file: %v", err)
+	}
 
-    datameta := Config_t{}
-    err = yaml.Unmarshal(data, &datameta)
-    if err != nil {
-        log.Fatalf("error: %v", err)
-    }
+	datameta := Config_t{}
+	err = yaml.Unmarshal(data, &datameta)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 
-    // If the schema definition file (schema_version) does not exist, we dont support it
-    schemadata, err := schemaDir.ReadFile("schemas/" + datameta.Metadata.SchemaVersion + ".yaml")
-    if err != nil {
-        log.Fatalf("Schema version %s is not supported in file %s", datameta.Metadata.SchemaVersion, file)
-    }
+	// If the schema definition file (schema_version) does not exist, we dont support it
+	schemadata, err := schemaDir.ReadFile("schemas/" + datameta.Metadata.SchemaVersion + ".yaml")
+	if err != nil {
+		log.Fatalf("Schema version %s is not supported in file %s", datameta.Metadata.SchemaVersion, file)
+	}
 
-    // Unmarshal the config schema
-    err = yaml.Unmarshal(data, configStruct)
-    if err != nil {
-        log.Fatalf("error: %v", err)
-    }
+	// Unmarshal the config schema
+	err = yaml.Unmarshal(data, configStruct)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 
-    // Unmarshal the validation schema
-    schema := ConfigValidator_t{}
-    err = yaml.Unmarshal(schemadata, &schema)
-    if err != nil {
-        log.Fatalf("error: %v", err)
-    }
+	// Unmarshal the validation schema
+	schema := ConfigValidator_t{}
+	err = yaml.Unmarshal(schemadata, &schema)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 
-    // Check if the schema id matches the workflow id
-    if datameta.Metadata.Id != configStruct.Metadata.Id {
-        log.Fatalf("Invalid workflow schema file, schema should contain id: %s", configStruct.Metadata.Id)
-    }
+	// Check if the schema id matches the workflow id
+	if datameta.Metadata.Id != configStruct.Metadata.Id {
+		log.Fatalf("Invalid workflow schema file, schema should contain id: %s", configStruct.Metadata.Id)
+	}
 
-    // Check if the schema version matches the internal schema validator
-    if schema.Metadata.SchemaVersion != datameta.Metadata.SchemaVersion {
-        log.Fatalf("Workflow schema version %s does not match internal schema validator %s",
-            datameta.Metadata.SchemaVersion, configStruct.Metadata.SchemaVersion,
-        )
-    }
+	// Check if the schema version matches the internal schema validator
+	if schema.Metadata.SchemaVersion != datameta.Metadata.SchemaVersion {
+		log.Fatalf("Workflow schema version %s does not match internal schema validator %s",
+			datameta.Metadata.SchemaVersion, configStruct.Metadata.SchemaVersion,
+		)
+	}
 
-    schema.validateConfig(configStruct)
+	schema.validateConfig(configStruct)
 
-    // Convert the map structure back to the original struct
-    res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-    mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
-    return res
+	// Convert the map structure back to the original struct
+	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
+	mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
+	return res
 }
 
 func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
-    // Validate the config against the schema
-    pad := ""
-    recurValidate(pad, c.Data.(map[string]interface{}))
-    return nil
+	// Validate the config against the schema
+	pad := ""
+	cv.recurValidate(pad, c.Data.(map[string]interface{}))
+	return nil
 }
 
-func recurValidate(pad string, data interface{}) {
-    pad = pad + "  "
-    switch v := data.(type) {
-    case map[string]interface{}:
-        for k, v := range v {
-            switch v.(type) {
-            case []interface{}:
-                log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
-                recurValidate(pad, v)
-            case map[string]interface{}:
-                log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
-                recurValidate(pad, v)
-            default:
-                log.Printf(pad+"Field - Key: %s, Value: %v\n", k, v)
-            }
-        }
-    case []interface{}:
-        for i, v := range v {
-            switch v.(type) {
-            case []interface{}:
-                log.Printf(pad+"List - %d, Value: %v\n", i, v)
-                recurValidate(pad, v)
-            case map[string]interface{}:
-                log.Printf(pad+"Map - %d, Value: %v\n", i, v)
-                recurValidate(pad, v)
-            default:
-                log.Printf(pad+"Field - %d, Value: %v\n", i, v)
-            }
-        }
-    }
+func (cv ConfigValidator_t) recurValidate(pad string, data interface{}) {
+	pad = pad + "  "
+	switch v := data.(type) {
+	case map[string]interface{}:
+		for k, v := range v {
+			switch v.(type) {
+			case []interface{}:
+				log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
+				cv.recurValidate(pad, v)
+			case map[string]interface{}:
+				log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
+				cv.recurValidate(pad, v)
+			default:
+				log.Printf(pad+"Field - Key: %s, Value: %v\n", k, v)
+				cv.checkValue(pad, v)
+			}
+		}
+	case []interface{}:
+		for i, v := range v {
+			switch v.(type) {
+			case []interface{}:
+				log.Printf(pad+"List - %d, Value: %v\n", i, v)
+				cv.recurValidate(pad, v)
+			case map[string]interface{}:
+				log.Printf(pad+"Map - %d, Value: %v\n", i, v)
+				cv.recurValidate(pad, v)
+			default:
+				log.Printf(pad+"Field - %d, Value: %v\n", i, v)
+				cv.checkValue(pad, v)
+			}
+		}
+	}
+}
+
+func (cv ConfigValidator_t) checkValue(pad string, v interface{}) {
+	switch v.(type) {
+	case string:
+		log.Printf(pad+"String: %s\n", v)
+		v = "new value"
+	case int:
+		log.Printf(pad+"Int: %d\n", v)
+	case bool:
+		log.Printf(pad+"Bool: %t\n", v)
+	default:
+		log.Printf(pad+"Unknown: %v\n", v)
+	}
 }

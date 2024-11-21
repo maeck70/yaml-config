@@ -24,7 +24,6 @@ data:
     host: localhost
   Redis:
     - host: localhost
-      db: 0
     - host: localhost2
       db: 1
   MyArray:

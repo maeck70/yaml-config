@@ -15,15 +15,6 @@ type Config_t struct {
 type sfattribute_t map[string]interface{}
 type sfitem_t []interface{}
 
-type item_t map[string]interface{}
-type itemMap_t map[string]interface{}
-type itemArray_t map[string]interface{}
-
-type items_t interface{}
-
-// type sfattribute_t map[string]SchemaField_t
-// type sfitem_t []SchemaField_t
-
 // Base Validation Schema
 type ConfigValidator_t struct {
 	Metadata Metadata_t    `yaml:"metadata"`
