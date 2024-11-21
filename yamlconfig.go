@@ -95,7 +95,7 @@ func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 		switch v.(type) {
 		case []interface{}:
 			log.Printf("List - Key: %s, Value: %v\n", k, v)
-		case map[string]interface{}:
+		case itemMap_t:
 			log.Printf("Map - Key: %s, Value: %v\n", k, v)
 
 			if _, ok := v.(map[string]interface{})["map"]; ok {
