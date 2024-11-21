@@ -193,21 +193,25 @@ func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
 // - e: A slice of errors to collect validation errors.
 func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []error) {
 	// Add any attributes that are not provided
-	for ks, vs := range cv {
+	for ks, vs := range data {
 		// check the type of vs
-		switch vs.(sfattribute_t)["type"] {
+		switch vs.(map[string]interface{})["type"] {
 		case "object":
-			// loop through the attributes in this object and add the missing attributes
-			for _, datao := range vs.(sfattribute_t) {
-				if datao.(string) == "object" {
-					cvo := datao.(sfattribute_t)
-					cvo.recurValidateConfig(datao.(map[string]interface{}), e)
+			log.Printf("object ks: %v", ks)
+			/*
+				// loop through the attributes in this object and add the missing attributes
+				for _, datao := range vs.(sfattribute_t) {
+					if datao.(string) == "object" {
+						cvo := datao.(sfattribute_t)
+						cvo.recurValidateConfig(datao.(map[string]interface{}), e)
+					}
 				}
-			}
+			*/
 		case "array":
+			log.Printf("array ks: %v", ks)
 			// No need to do anything, arrays have no defaults
 		default:
-			log.Printf("ks: %v", ks)
+			log.Printf("default ks: %v", ks)
 			// No need to do anything, arrays have no defaults
 			// sf := vs.(sfattribute_t)
 			// addMissingAttr(ks, sf[ks].(SchemaField_t), data)
