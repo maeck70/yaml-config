@@ -196,13 +196,13 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 	for ks, vs := range cv {
 		t := reflect.TypeOf(vs).String()
 		switch t {
-		case "object":
+		case "yamlconfig.sfattribute_t":
 			// loop through the attributes in this object and add the missing attributes
 			cvo := cv[ks].(SchemaField_t).Attributes
 			for _, datao := range data[ks].(map[string]interface{}) {
 				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
 			}
-		case "array":
+		case "yamlconfig.sfitem_t":
 			// loop through the items in this object and add the missing items
 			cvo := cv[ks].(SchemaField_t).Items
 			for _, datao := range data[ks].(map[string]interface{}) {
