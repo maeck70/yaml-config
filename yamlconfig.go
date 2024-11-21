@@ -206,7 +206,6 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 
 		case []interface{}:
 			log.Printf("  - array interface ks: %v", ks)
-			cv.recurValidateConfig(vs.(map[string]interface{}), e)
 		}
 
 		/*
