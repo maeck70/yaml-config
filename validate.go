@@ -28,9 +28,6 @@ func (cv Schema_t) recurValidate(pad string, data interface{}, key string) {
 				ncv.recurValidate(pad, v, k)
 			default:
 				log.Printf(pad+"Field - Key: %s, Value: %v\n", k, v)
-				value := val[k]
-				ncv.checkValue(pad, k, &value)
-				data.(map[string]interface{})[k] = value
 			}
 		}
 		cv.checkFields(pad, data)
@@ -47,7 +44,6 @@ func (cv Schema_t) recurValidate(pad string, data interface{}, key string) {
 				ncv.recurValidate(pad, v, key)
 			default:
 				log.Printf(pad+"Field - %d, Value: %v\n", i, v)
-				ncv.checkValue(pad, key, &val[i])
 			}
 		}
 		cv.checkFields(pad, data)
@@ -77,6 +73,9 @@ func (cv Schema_t) checkFields(pad string, data interface{}) {
 			log.Printf(pad+"Setting default value for %s to %v\n", k, v.Default)
 			data.(map[string]interface{})[k] = v.Default
 		}
+
+		// Check value against fields
+		cv.checkValue(pad, k, &value)
 	}
 }
 
@@ -85,37 +84,41 @@ func (cv Schema_t) checkValue(pad string, schemakey string, v *interface{}) {
 	case string:
 		// log.Printf(pad+"String: %s\n", val)
 		// *v = "new value"
+
 	case int:
 		if cv[schemakey].Min > 0 || cv[schemakey].Max > 0 {
 			if val > int(cv[schemakey].Max) {
-				log.Fatalf(pad+"On attribute %s value %d is greater than max %d.\n",
+				log.Fatalf(pad+"On field %s value %d is greater than max %d.\n",
 					schemakey, val, cv[schemakey].Max)
 			}
 			if val < int(cv[schemakey].Min) {
-				log.Fatalf(pad+"On attribute %s value %d is less than min %d.\n",
+				log.Fatalf(pad+"On field %s value %d is less than min %d.\n",
 					schemakey, val, cv[schemakey].Min)
 			}
 		}
 		// log.Printf(pad+"Int: %d\n", val)
 		//*v = val + 1
+
 	case float64:
 		if cv[schemakey].Min > 0 || cv[schemakey].Max > 0 {
 			if val > float64(cv[schemakey].Max) {
-				log.Fatalf(pad+"On attribute %s value %f is greater than max %f.\n",
+				log.Fatalf(pad+"On field %s value %f is greater than max %f.\n",
 					schemakey, val, cv[schemakey].Max)
 			}
 			if val < float64(cv[schemakey].Min) {
-				log.Fatalf(pad+"On attribute %s value %f is less than min %f.\n",
+				log.Fatalf(pad+"On field %s value %f is less than min %f.\n",
 					schemakey, val, cv[schemakey].Min)
 			}
 		}
 		// log.Printf(pad+"Int: %d\n", val)
 		//*v = val + 1
+
 	case bool:
 		// log.Printf(pad+"Bool: %t\n", val)
 		//*v = !val
+
 	default:
-		// log.Printf(pad+"Unknown: %v\n", val)
+		log.Printf(pad+"Unknown field type: %v\n", val)
 	}
 
 	// Get the details from cv for field key

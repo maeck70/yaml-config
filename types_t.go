@@ -13,7 +13,6 @@ type Config_t struct {
 }
 
 type sfitem_t []interface{}
-type Schema_t map[string]SchemaField_t
 
 // Base Validation Schema
 type ConfigValidator_t struct {
@@ -21,7 +20,10 @@ type ConfigValidator_t struct {
 	Schema   Schema_t   `yaml:"schema"`
 }
 
-// Schema Field
+// Schema is the map of fields on that level
+type Schema_t map[string]SchemaField_t
+
+// SchemaField contains the attributes for the fields
 type SchemaField_t struct {
 	Type        string   `yaml:"type"`
 	Description string   `yaml:"description"`
