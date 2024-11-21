@@ -2,7 +2,6 @@ package yamlconfig
 
 import (
 	"embed"
-	"fmt"
 	"log"
 	"os"
 	"reflect"
@@ -83,238 +82,95 @@ func LoadConfig(file string, customStruct interface{}) any {
 
 	// Convert the map structure back to the original struct
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-	mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
+	mapstructure.Decode(configStruct.Data.(items_t), &res)
 	return res
 }
 
-// validateConfig validates the configuration against the schema.
-//
-// Parameters:
-// - c: A pointer to the Config_t struct containing the configuration.
-//
-// Returns:
-// - An error if validation fails.
 func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
-	errors := []error{}
-	data := c.Data.(map[string]interface{})
+	// Validate the config against the schema
 
-	// Add missing attributes and default them
-	cvo := cv.Schema
-	cvo.recurValidateConfig(data, errors)
+	pad := ""
 
-	// Check validity of the attributes
-	// cv.checkAttr(data, errors)
+	for k, v := range c.Data.(map[string]interface{}) {
+		switch v.(type) {
+		case []interface{}:
+			log.Printf("List - Key: %s, Value: %v\n", k, v)
+		case map[string]interface{}:
+			log.Printf("Map - Key: %s, Value: %v\n", k, v)
 
-	// Check and report errors
-	if len(errors) != 0 {
-		fmt.Println("Validation failed:")
-		for _, e := range errors {
-			fmt.Printf("  %v\n", e)
+			if _, ok := v.(map[string]interface{})["map"]; ok {
+				mapRecursive(pad, v.(map[string]interface{})["map"].(map[string]interface{}))
+			}
+
+			if _, ok := v.(map[string]interface{})["array"]; ok {
+				arrayRecursive(pad, v.(map[string]interface{})["array"].([]interface{}))
+			}
+
+		default:
+			log.Printf("Default - Key: %s, Value: %v\n", k, v)
 		}
-		fmt.Println("")
 	}
 
 	return nil
 }
 
-// addMissingAttr adds missing attributes to the configuration data and sets default values.
-//
-// Parameters:
-// - ks: The key of the attribute.
-// - vs: The schema field definition of the attribute.
-// - data: The configuration data map.
-func addMissingAttr(ks string, vs SchemaField_t, data map[string]interface{}) {
-	if _, ok := data[ks]; !ok {
-		if vs.Default == nil {
-			switch vs.Type {
-			case "string":
-				data[ks] = ""
-			case "integer":
-				if vs.Min != 0 {
-					data[ks] = int(vs.Min)
-				} else {
-					data[ks] = 0
-				}
-			case "float":
-				if vs.Min != 0 {
-					data[ks] = float64(vs.Min)
-				} else {
-					data[ks] = 0.0
-				}
-			case "boolean":
-				data[ks] = false
-			case "array":
-				data[ks] = []interface{}{}
-			case "object":
-				data[ks] = map[string]interface{}{}
-			default:
-				log.Fatalf("field %s has an unknown type", ks)
-			}
-		} else {
-			data[ks] = vs.Default
-		}
-	}
-}
-
-func addMissingItem(i int, vs SchemaField_t, data []interface{}) {
-	if vs.Default == nil {
-		switch vs.Type {
-		case "string":
-			data[i] = ""
-		case "integer":
-			if vs.Min != 0 {
-				data[i] = int(vs.Min)
-			} else {
-				data[i] = 0
-			}
-		case "float":
-			if vs.Min != 0 {
-				data[i] = float64(vs.Min)
-			} else {
-				data[i] = 0.0
-			}
-		case "boolean":
-			data[i] = false
-		case "array":
-			data[i] = []interface{}{}
-		case "object":
-			data[i] = map[string]interface{}{}
-		default:
-			log.Fatalf("item %d has an unknown type", i)
-		}
-	}
-}
-
-// recurValidateConfig recursively validates the configuration data against the schema
-// for nested objects.
-//
-// Parameters:
-// - data: The configuration data map.
-// - e: A slice of errors to collect validation errors.
-func (cv SchemaField_t) recurValidateConfig(data map[string]interface{}, e []error) {
-	// Add any attributes that are not provided
-	for ks, vs := range data {
-
-		log.Printf("- ks: %v vs: %+v", ks, vs)
-		log.Printf("  type: %s", reflect.TypeOf(vs).String())
-
-		switch vst := vs.(type) {
-		case map[string]interface{}:
-			log.Printf("  - map interface ks: %v", ks)
-			cv.recurValidateConfig(vst, e)
-
+func mapRecursive(pad string, data map[string]interface{}) {
+	pad = pad + "  "
+	for k, v := range data {
+		switch v.(type) {
 		case []interface{}:
-			log.Printf("  - array interface ks: %v", ks)
-
+			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
+		case map[string]interface{}:
+			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
+			// mapRecursive(pad)
 		default:
-			log.Printf("  - other ks: %v %v", ks, vst)
-			addMissingAttr(ks, cv, data)
+			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
 		}
+	}
+}
 
-		/*
-			// check the type of vs
-			switch reflect.TypeOf(vs.(interface{})).String() {
-			case "yamlconfig.sfattribute_t":
-				log.Printf("object ks: %v", ks)
-
-					// loop through the attributes in this object and add the missing attributes
-					for _, datao := range vs.(sfattribute_t) {
-						if datao.(string) == "object" {
-							cvo := datao.(sfattribute_t)
-							cvo.recurValidateConfig(datao.(map[string]interface{}), e)
-						}
-					}
-
-			case "array":
-				log.Printf("array ks: %v", ks)
-				// No need to do anything, arrays have no defaults
-			default:
-				log.Printf("default ks: %v", ks)
-				// No need to do anything, arrays have no defaults
-				// sf := vs.(sfattribute_t)
-				// addMissingAttr(ks, sf[ks].(SchemaField_t), data)
-			}*/
+func arrayRecursive(pad string, data []interface{}) {
+	pad = pad + "  "
+	for k, v := range data {
+		switch v.(type) {
+		case []interface{}:
+			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
+		case map[string]interface{}:
+			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
+			// mapRecursive(pad)
+		default:
+			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
+		}
 	}
 }
 
 /*
-// checkAttr checks the attribute values in the configuration data against the schema.
-//
-// Parameters:
-// - data: The configuration data map.
-// - e: A slice of errors to collect validation errors.
-func (cv ConfigValidator_t) checkAttr(data map[string]interface{}, e []error) {
-	// Check attribute values
+func mapRecursive(pad string, data map[string]interface{}) {
+	pad = pad + "  "
 	for k, v := range data {
-		val := cv.Schema[k].(map[string]interface{})
-
-		// Check Required and use Default if not set
-		if val.Required && val.Default == nil && v == nil {
-			e = append(e, fmt.Errorf("required field %s is empty", k))
-		}
-
-		// Check if Default is set and value is empty
-		if val.Default != nil && v == nil {
-			data[k] = val.Default
-		}
-
-		// Check field value types
-		switch val.Type {
-		case "string":
-			// check if value is a string
-			if _, ok := v.(string); !ok {
-				e = append(e, fmt.Errorf("field %s is not a string", k))
-			}
-		case "integer":
-			// check if value is an integer
-			if _, ok := v.(int); !ok {
-				e = append(e, fmt.Errorf("field %s is not an integer", k))
-			}
-			// check if integer within min max range
-			if val.Min != 0 && v.(int) < int(val.Min) {
-				e = append(e, fmt.Errorf("field %s is less than min value", k))
-			}
-			if val.Max != 0 && v.(int) > int(val.Max) {
-				e = append(e, fmt.Errorf("field %s is greater than max value", k))
-			}
-		case "float":
-			// Check if value is a float
-			if _, ok := v.(float64); !ok {
-				e = append(e, fmt.Errorf("field %s is not a float", k))
-			}
-		case "boolean":
-			// check if value is a boolean
-			if _, ok := v.(bool); !ok {
-				e = append(e, fmt.Errorf("field %s is not a boolean", k))
-			}
-		case "array":
-			// Check if value is an array
-			if _, ok := v.([]interface{}); !ok {
-				e = append(e, fmt.Errorf("field %s is not an array", k))
-			}
-			for i, o := range v.([]interface{}) {
-				// Check if the option is of the correct type
-				switch val.OptionType {
-				case "string":
-					if _, ok := o.(string); !ok {
-						e = append(e, fmt.Errorf("field %s option %d is not a string", k, i))
-					}
-				case "integer":
-					if _, ok := o.(int); !ok {
-						e = append(e, fmt.Errorf("field %s option %d is not an integer", k, i))
-					}
-				case "float":
-					if _, ok := o.(float64); !ok {
-						e = append(e, fmt.Errorf("field %s option %d is not a float", k, i))
-					}
-				default:
-					e = append(e, fmt.Errorf("field %s has an unknown option type", k))
-				}
-			}
-		case "object":
-			// Do nothing for now
+		switch v.(type) {
+		case []interface{}:
+			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
+		case map[string]interface{}:
+			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
+			// mapRecursive(pad)
 		default:
-			e = append(e, fmt.Errorf("field %s has an unknown type", k))
+			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
+		}
+	}
+}
+
+func arrayRecursive(pad string, data []interface{}) {
+	pad = pad + "  "
+	for k, v := range data {
+		switch v.(type) {
+		case []interface{}:
+			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
+		case map[string]interface{}:
+			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
+			// mapRecursive(pad)
+		default:
+			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
 		}
 	}
 }

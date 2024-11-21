@@ -1,5 +1,4 @@
 # config file
-# uses example.schema.yaml
 
 metadata:
   schema_version: 0.1example
@@ -13,16 +12,23 @@ data:
     - Foo
     - Bar
   Rabbitmq:
-    main:
-      host: localhost
-      user: guest
-      password: guest
-    baskets: 
-      host: localhost
-      port: 5672
-      user: guest
-      password: guest
-      vhost: /baskets
+    map:
+      main:
+        host: localhost
+        user: guest
+        password: guest
+      secondary:
+        host: localhost2
+        user: willem
+        password: waters
+  MySql:
+    host: localhost
+  Redis:
+    array:
+      - host: localhost
+        db: 0
+      - host: localhost2
+        db: 1
   MyArray:
     - path: ./path1
     - path: ./path2

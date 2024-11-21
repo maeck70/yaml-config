@@ -12,6 +12,11 @@ type RabbitMQ_t struct {
 	Vhost    string `yaml:"vhost"`
 }
 
+type Mysql_t struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+}
+
 type myConfig_t struct {
 	Name     string                `yaml:"Name"`
 	City     string                `yaml:"City"`
@@ -19,6 +24,7 @@ type myConfig_t struct {
 	Id       int                   `yaml:"Id"`
 	Options  []string              `yaml:"Options"`
 	Rabbitmq map[string]RabbitMQ_t `yaml:"Rabbitmq"`
+	Mysql    Mysql_t               `yaml:"Mysql"`
 }
 
 func TestYamlConfig(t *testing.T) {
@@ -28,7 +34,7 @@ func TestYamlConfig(t *testing.T) {
 	c := LoadConfig("testfiles/example.config.yaml", &myc)
 	newConf := c.(*myConfig_t)
 	if newConf.Name != "MyName" {
-		t.Errorf("Name: %s\n", newConf.Name)
+		t.Errorf("MyConf: %+v\n", newConf)
 	}
 }
 

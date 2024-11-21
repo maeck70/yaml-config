@@ -28,7 +28,34 @@ schema:
     required: false
   Rabbitmq:
     type: object
-    description: Rabbitmq configuration
+    description: Map of Rabbitmq configurations
+    group:
+      type: object
+      description: Rabbitmq configuration
+      attributes:
+        host:
+          type: string
+          description: Hostname
+          required: true
+        port:
+          type: integer
+          description: Port number
+          default: 5672
+        user:
+          type: string
+          description: Username
+          required: true 
+        password:
+          type: string
+          description: Password
+          required: true
+        vhost:
+          type: string
+          description: Virtual host
+          default: /
+  MySql:
+    type: object
+    description: MySql configuration
     attributes:
       host:
         type: string
@@ -37,19 +64,21 @@ schema:
       port:
         type: integer
         description: Port number
-        default: 5672
-      user:
-        type: string
-        description: Username
-        required: true 
-      password:
-        type: string
-        description: Password
-        required: true
-      vhost:
-        type: string
-        description: Virtual host
-        default: /
+        default: 1234
+  Redis:
+    type: object
+    description: MySql configuration
+    list:
+      attributes:
+        host:
+          type: string
+          description: Hostname
+          required: true
+        db:
+          type: integer
+          description: Database Number
+          default: 0
+  
   MyArray:
     type: array
     description: List of paths
