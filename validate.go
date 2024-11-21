@@ -28,6 +28,9 @@ func (cv ConfigValidator_t) recurValidate(pad string, data interface{}) {
 				value := val[k]
 				cv.checkValue(pad, &value)
 				data.(map[string]interface{})[k] = value
+
+				// Get the details from cv for field k
+				log.Printf("Schema field %s specs: %+v", k, cv.Schema[k])
 			}
 		}
 	case []interface{}:
