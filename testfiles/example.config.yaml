@@ -16,6 +16,7 @@ data:
       host: localhost
       user: guest
       password: guest
+      vhost: /
     secondary:
       host: localhost2
       user: willem

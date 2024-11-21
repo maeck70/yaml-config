@@ -15,7 +15,7 @@ func (cv ConfigValidator_t) recurValidate(pad string, data interface{}) {
 	pad = pad + "  "
 	switch val := data.(type) {
 	case map[string]interface{}:
-		for k, v := range val {
+		for k, v := range data.(map[string]interface{}) { //val {
 			switch v := v.(type) {
 			case []interface{}:
 				log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
@@ -27,6 +27,7 @@ func (cv ConfigValidator_t) recurValidate(pad string, data interface{}) {
 				log.Printf(pad+"Field - Key: %s, Value: %v\n", k, v)
 				value := val[k]
 				cv.checkValue(pad, &value)
+				data.(map[string]interface{})[k] = value
 			}
 		}
 	case []interface{}:
