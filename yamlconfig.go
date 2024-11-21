@@ -205,8 +205,8 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 		case "array":
 			// loop through the attributes in this object and add the missing attributes
 			for _, datao := range vs.(sfattribute_t) {
-				cvo := datao.(sfattribute_t)
-				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
+				sf := datao.(sfattribute_t)
+				addMissingAttr(ks, sf[ks].(SchemaField_t), data)
 			}
 			/*
 				// loop through the items in this object and add the missing items
