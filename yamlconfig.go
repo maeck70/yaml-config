@@ -213,29 +213,6 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 	}
 }
 
-func (cv sfitem_t) recurValidateConfig(data []interface{}, e []error) {
-	// Add any attributes that are not provided
-	for i, vs := range cv {
-		switch reflect.TypeOf(vs).String() {
-		case "object":
-			// loop through the attributes in this object and add the missing attributes
-			cvo := cv[i].(SchemaField_t).Attributes
-			for _, datao := range data[i].(map[string]interface{}) {
-				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
-			}
-		case "array":
-			// loop through the items in this object and add the missing items
-			cvo := cv[i].(SchemaField_t).Items
-			for _, datao := range data[i].(map[string]interface{}) {
-				cvo.recurValidateConfig(datao.([]interface{}), e)
-			}
-
-		default:
-			addMissingItem(i, vs.(SchemaField_t), data)
-		}
-	}
-}
-
 // checkAttr checks the attribute values in the configuration data against the schema.
 //
 // Parameters:
