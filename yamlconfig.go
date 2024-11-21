@@ -199,8 +199,10 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 		case "object":
 			// loop through the attributes in this object and add the missing attributes
 			for _, datao := range vs.(sfattribute_t) {
-				cvo := datao.(sfattribute_t)
-				cvo.recurValidateConfig(datao.(map[string]interface{}), e)
+				if datao.(sfattribute_t)["type"] == "object" {
+					cvo := datao.(sfattribute_t)
+					cvo.recurValidateConfig(datao.(map[string]interface{}), e)	
+				}
 			}
 		case "array":
 			// No need to do anything, arrays have no defaults
