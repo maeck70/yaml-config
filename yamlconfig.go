@@ -207,7 +207,8 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 			log.Printf("  - array interface ks: %v", ks)
 
 		default:
-			log.Printf("  - other ks: %v %s", ks, vst)
+			log.Printf("  - other ks: %v %v", ks, vst)
+			addMissingAttr(ks, cv[ks].(SchemaField_t), data)
 		}
 
 		/*
