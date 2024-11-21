@@ -196,7 +196,7 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 	for ks, vs := range data {
 
 		log.Printf("- ks: %v vs: %+v", ks, vs)
-		log.Printf("  type: %s", reflect.TypeOf(vs.(interface{})).String())
+		log.Printf("  type: %s", reflect.TypeOf(vs).String())
 
 		/*
 			// check the type of vs
