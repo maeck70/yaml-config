@@ -195,8 +195,8 @@ func (cv sfattribute_t) recurValidateConfig(data map[string]interface{}, e []err
 	// Add any attributes that are not provided
 	for ks, vs := range data {
 		// check the type of vs
-		switch vs.(map[string]interface{})["type"] {
-		case "object":
+		switch reflect.TypeOf(vs.(interface{})).String() {
+		case "yamlconfig.sfattribute_t":
 			log.Printf("object ks: %v", ks)
 			/*
 				// loop through the attributes in this object and add the missing attributes
