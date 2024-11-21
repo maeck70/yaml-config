@@ -17,7 +17,7 @@ type sfitem_t []interface{}
 
 type item_t map[string]interface{}
 type itemMap_t map[string]interface{}
-type itemArray_t []interface{}
+type itemArray_t map[string]interface{}
 
 type items_t interface{}
 

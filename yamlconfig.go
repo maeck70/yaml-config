@@ -95,19 +95,12 @@ func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 		switch v.(type) {
 		case []interface{}:
 			log.Printf("List - Key: %s, Value: %v\n", k, v)
-		case itemMap_t:
+			arrayRecursive(pad, v.([]interface{}))
+		case map[string]interface{}:
 			log.Printf("Map - Key: %s, Value: %v\n", k, v)
-
-			if _, ok := v.(map[string]interface{})["map"]; ok {
-				mapRecursive(pad, v.(map[string]interface{})["map"].(map[string]interface{}))
-			}
-
-			if _, ok := v.(map[string]interface{})["array"]; ok {
-				arrayRecursive(pad, v.(map[string]interface{})["array"].([]interface{}))
-			}
-
+			mapRecursive(pad, v.(map[string]interface{}))
 		default:
-			log.Printf("Default - Key: %s, Value: %v\n", k, v)
+			log.Printf("Field - Key: %s, Value: %v\n", k, v)
 		}
 	}
 
@@ -120,11 +113,12 @@ func mapRecursive(pad string, data map[string]interface{}) {
 		switch v.(type) {
 		case []interface{}:
 			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
+			arrayRecursive(pad, v.([]interface{}))
 		case map[string]interface{}:
 			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
-			// mapRecursive(pad)
+			mapRecursive(pad, v.(map[string]interface{}))
 		default:
-			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
+			log.Printf(pad+"Field - Key: %s, Value: %v\n", k, v)
 		}
 	}
 }
@@ -134,44 +128,13 @@ func arrayRecursive(pad string, data []interface{}) {
 	for k, v := range data {
 		switch v.(type) {
 		case []interface{}:
-			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
+			log.Printf(pad+"List - %d, Value: %v\n", k, v)
+			arrayRecursive(pad, v.([]interface{}))
 		case map[string]interface{}:
-			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
-			// mapRecursive(pad)
+			log.Printf(pad+"Map - %d, Value: %v\n", k, v)
+			mapRecursive(pad, v.(map[string]interface{}))
 		default:
-			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
+			log.Printf(pad+"Field - %d, Value: %v\n", k, v)
 		}
 	}
 }
-
-/*
-func mapRecursive(pad string, data map[string]interface{}) {
-	pad = pad + "  "
-	for k, v := range data {
-		switch v.(type) {
-		case []interface{}:
-			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
-		case map[string]interface{}:
-			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
-			// mapRecursive(pad)
-		default:
-			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
-		}
-	}
-}
-
-func arrayRecursive(pad string, data []interface{}) {
-	pad = pad + "  "
-	for k, v := range data {
-		switch v.(type) {
-		case []interface{}:
-			log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
-		case map[string]interface{}:
-			log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
-			// mapRecursive(pad)
-		default:
-			log.Printf(pad+"Default - Key: %s, Value: %v\n", k, v)
-		}
-	}
-}
-*/
