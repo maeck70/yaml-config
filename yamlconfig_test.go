@@ -30,7 +30,7 @@ type myConfig_t struct {
 	Options  []string              `yaml:"Options"`
 	Rabbitmq map[string]RabbitMQ_t `yaml:"Rabbitmq"`
 	Mysql    Mysql_t               `yaml:"Mysql"`
-	Redis    Redis_t               `yaml:"Redis"`
+	Redis    []Redis_t             `yaml:"Redis"`
 }
 
 func TestYamlConfig(t *testing.T) {
