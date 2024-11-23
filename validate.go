@@ -7,75 +7,82 @@ import (
 func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 	// Validate the config against the schema
 	pad := ""
-	ncv := cv.Schema
-	ncv.recurValidate(pad, c.Data.(map[string]interface{}), "")
+	recurValidate(pad, c.Data.(map[string]interface{}), "", cv.Schema)
 	return nil
 }
 
-func (cv Schema_t) recurValidate(pad string, data interface{}, key string) {
+func recurValidate(pad string, data any /*map[string]interface{}*/, key string, cv Schema_t) {
 	pad = pad + "  "
 	switch val := data.(type) {
 	case map[string]interface{}:
-
+		log.Printf("val: %+v\n", val)
 		for k, v := range data.(map[string]interface{}) {
-			ncv := cv[k].Attributes
+			ncv := cv
 			switch v := v.(type) {
 			case []interface{}:
-				log.Printf(pad+"List - Key: %s, Value: %v\n", k, v)
-				ncv.recurValidate(pad, v, k)
+				log.Printf(pad+"List - Key: %s Value: %v", k, v)
+				ncv := cv
+				// recurValidate(pad, v, k, ncv)
+				log.Printf(pad+"NCV: %+v", ncv)
 			case map[string]interface{}:
-				log.Printf(pad+"Map - Key: %s, Value: %v\n", k, v)
-				ncv.recurValidate(pad, v, k)
+				log.Printf(pad+"Map - Key: %s Value: %v", k, v)
+				recurValidate(pad, v, k, ncv)
+				log.Printf(pad+"NCV: %+v", ncv)
+				checkFields(pad, data, ncv[k])
 			default:
-				log.Printf(pad+"Field - Key: %s, Value: %v\n", k, v)
+				log.Printf(pad+"Field - Key: %s Value: %v", k, v)
 			}
 		}
-		cv.checkFields(pad, data)
 
-	case []interface{}:
-		for i, v := range val {
-			ncv := cv[key].Attributes
-			switch v := v.(type) {
+		/*
 			case []interface{}:
-				log.Printf(pad+"List - %d, Value: %v\n", i, v)
-				ncv.recurValidate(pad, v, key)
-			case map[string]interface{}:
-				log.Printf(pad+"Map - %d, Value: %v\n", i, v)
-				ncv.recurValidate(pad, v, key)
-			default:
-				log.Printf(pad+"Field - %d, Value: %v\n", i, v)
-			}
-		}
-		cv.checkFields(pad, data)
-
+				for i, v := range val {
+					ncv := cv[key]
+					switch v := v.(type) {
+					case []interface{}:
+						log.Printf(pad+"List - %d Value: %v", i, v)
+						//recurValidate(pad, v, key, ncv)
+						log.Printf(pad+"NCV: %+v", ncv)
+					case map[string]interface{}:
+						log.Printf(pad+"Map - %d Value: %v", i, v)
+						//recurValidate(pad, v, key, ncv)
+						log.Printf(pad+"NCV: %+v", ncv)
+					default:
+						log.Printf(pad+"Field - %d Value: %v", i, v)
+					}
+				}
+				checkFields(pad, data, cv)
+		*/
 	}
 }
 
-func (cv Schema_t) checkFields(pad string, data interface{}) {
+func checkFields(pad string, data any /*interface{}*/, cv SchemaField_t) {
 	// Check if the schema fields are present in the data
-	for k, v := range cv {
+	for k, v := range cv.Group {
 		value := data.(map[string]interface{})[k]
 		log.Printf(pad+"Validate %s, %+v = %v", k, v, value)
 
-		// Check if required field is empty
-		if v.Required {
-			if value == nil {
-				log.Fatalf(pad+"Required field %s is missing.\n", k)
+		/*
+			// Check if required field is empty
+			if v.Required {
+				if value == nil {
+					log.Fatalf(pad+"Required field %s is missing.\n", k)
+				}
 			}
-		}
 
-		// Set default if non existent
-		if data.(map[string]interface{})[k] == nil {
-			log.Printf(pad+"Setting default value for %s to %v\n", k, v.Default)
-			data.(map[string]interface{})[k] = v.Default
-		}
-		if _, ok := data.(map[string]interface{})[k]; !ok {
-			log.Printf(pad+"Setting default value for %s to %v\n", k, v.Default)
-			data.(map[string]interface{})[k] = v.Default
-		}
+			// Set default if non existent
+			if data.(map[string]interface{})[k] == nil {
+				log.Printf(pad+"Setting default value for %s to %v\n", k, v.Default)
+				data.(map[string]interface{})[k] = v.Default
+			}
+			if _, ok := data.(map[string]interface{})[k]; !ok {
+				log.Printf(pad+"Setting default value for %s to %v\n", k, v.Default)
+				data.(map[string]interface{})[k] = v.Default
+			}
 
-		// Check value against fields
-		cv.checkValue(pad, k, &value)
+			// Check value against fields
+			cv.checkValue(pad, k, &value)
+		*/
 	}
 }
 

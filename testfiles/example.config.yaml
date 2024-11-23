@@ -5,13 +5,13 @@ metadata:
   id: ExampleConfig
 
 data:
-  Name: Marcel
-  City: Walnut Creek
-  Id: 123
-  State: CA
-  Options:
-    - foo
-    - Bar
+  # Name: Marcel
+  # City: Walnut Creek
+  # Id: 123
+  # State: CA
+  # Options:
+  #   - foo
+  #   - Bar
   Rabbitmq:
     main:
       host: localhost
@@ -22,14 +22,14 @@ data:
       host: localhost2
       user: willem
       password: waters
-  MySql:
-    host: localhost
-  Redis:
-    - host: localhost
-      db: 0
-    - host: localhost2
-      db: 20
-  MyArray:
-    - path: ./path1
-    - path: ./path2
-    - path: ./path3
+  # MySql:
+  #   host: localhost
+  # Redis:
+  #   - host: localhost
+  #     db: 0
+  #   - host: localhost2
+  #     db: 20
+  # MyArray:
+  #   - path: ./path1
+  #   - path: ./path2
+  #   - path: ./path3

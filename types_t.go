@@ -23,17 +23,20 @@ type ConfigValidator_t struct {
 // Schema is the map of fields on that level
 type Schema_t map[string]SchemaField_t
 
+type Group_t SchemaField_t
+
 // SchemaField contains the attributes for the fields
 type SchemaField_t struct {
-	Type        string   `yaml:"type"`
-	Description string   `yaml:"description"`
-	Required    bool     `yaml:"required"`
-	Default     any      `yaml:"default"`
-	Options     []any    `yaml:"options"`
-	OptionType  string   `yaml:"optiontype"`
-	Min         int64    `yaml:"min"`
-	Max         int64    `yaml:"max"`
-	Attributes  Schema_t `yaml:"attributes"`
-	Items       sfitem_t `yaml:"items"`
-	Valid       []string `yaml:"valid"`
+	Type        string                 `yaml:"type"`
+	Description string                 `yaml:"description"`
+	Required    bool                   `yaml:"required"`
+	Default     any                    `yaml:"default"`
+	Options     []any                  `yaml:"options"`
+	OptionType  string                 `yaml:"optiontype"`
+	Min         int64                  `yaml:"min"`
+	Max         int64                  `yaml:"max"`
+	Attributes  map[string]interface{} `yaml:"attributes"`
+	Items       sfitem_t               `yaml:"items"`
+	Valid       []string               `yaml:"valid"`
+	Group       map[string]interface{} `yaml:"group"`
 }

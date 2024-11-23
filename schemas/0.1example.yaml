@@ -5,33 +5,33 @@ metadata:
   id: ExampleConfig
   
 schema:
-  Name:
-    type: string
-    description: Name of the user
-    required: true
-  City:
-    type: string
-    description: City of the user
-    required: true
-  State:
-    type: string
-    description: State of the user
-    required: true
-  Id:
-    type: integer
-    description: Unique identifier
-    required: false
-    min: 100
-    max: 200    
-  Options:
-    type: array
-    description: List of options
-    optiontype: string
-    required: false
-    valid:
-      - foo
-      - bar
-      - baz
+  # Name:
+  #   type: string
+  #   description: Name of the user
+  #   required: true
+  # City:
+  #   type: string
+  #   description: City of the user
+  #   required: true
+  # State:
+  #   type: string
+  #   description: State of the user
+  #   required: true
+  # Id:
+  #   type: integer
+  #   description: Unique identifier
+  #   required: false
+  #   min: 100
+  #   max: 200    
+  # Options:
+  #   type: array
+  #   description: List of options
+  #   optiontype: string
+  #   required: false
+  #   valid:
+  #     - foo
+  #     - bar
+  #     - baz
   Rabbitmq:
     type: object
     description: Map of Rabbitmq configurations
@@ -59,38 +59,39 @@ schema:
           type: string
           description: Virtual host
           default: /
-  MySql:
-    type: object
-    description: MySql configuration
-    attributes:
-      host:
-        type: string
-        description: Hostname
-        required: true
-      port:
-        type: integer
-        description: Port number
-        default: 1234
-  Redis:
-    type: object
-    description: MySql configuration
-    list:
-      attributes:
-        host:
-          type: string
-          description: Hostname
-          required: true
-        db:
-          type: integer
-          description: Database Number
-          default: 0
-          min: 0
-          max: 15
-  MyArray:
-    type: array
-    description: List of paths
-    list:
-      attributes:
-        path:
-          type: string
-          description: Path
+
+  # MySql:
+  #   type: object
+  #   description: MySql configuration
+  #   attributes:
+  #     host:
+  #       type: string
+  #       description: Hostname
+  #       required: true
+  #     port:
+  #       type: integer
+  #       description: Port number
+  #       default: 1234
+  # Redis:
+  #   type: object
+  #   description: MySql configuration
+  #   List:
+  #     attributes:
+  #       host:
+  #         type: string
+  #         description: Hostname
+  #         required: true
+  #       db:
+  #         type: integer
+  #         description: Database Number
+  #         default: 0
+  #         min: 0
+  #         max: 15
+  # MyArray:
+  #   type: array
+  #   description: List of paths
+  #   List:
+  #     attributes:
+  #       path:
+  #         type: string
+  #         description: Path
