@@ -14,48 +14,54 @@ func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 func recurValidate(pad string, data any, schema interface{}, key string) {
 
 	switch s := schema.(type) {
+
 	case GroupField_t:
 		log.Printf(pad+"RVGroup - %s = %+v", key, schema)
 
 		csa := s.Attributes
 		log.Printf(pad+"CS - %+v", csa)
 		for k, v := range s.Attributes {
-			sf := *new(SchemaField_t)
+
+			sf2 := *new(SchemaField_t)
 			for rkey, rvalue := range v.(map[string]interface{}) {
 				log.Printf(pad+"rkey %s rvalue - %+v", rkey, rvalue)
 
 				switch rkey {
 				case "type":
-					sf.Type = rvalue.(string)
+					sf2.Type = rvalue.(string)
 				case "description":
-					sf.Description = rvalue.(string)
+					sf2.Description = rvalue.(string)
 				case "required":
-					sf.Required = rvalue.(bool)
+					sf2.Required = rvalue.(bool)
 				case "default":
-					sf.Default = rvalue
+					sf2.Default = rvalue
 				case "options":
-					sf.Options = rvalue.([]any)
+					sf2.Options = rvalue.([]any)
 				case "optiontype":
-					sf.OptionType = rvalue.(string)
+					sf2.OptionType = rvalue.(string)
 				case "min":
-					sf.Min = rvalue.(int)
+					sf2.Min = rvalue.(int)
 				case "max":
-					sf.Max = rvalue.(int)
+					sf2.Max = rvalue.(int)
 				case "attributes":
-					sf.Attributes = rvalue.(map[string]SchemaField_t)
+					sf2.Attributes = rvalue.(map[string]SchemaField_t)
 				case "items":
-					sf.Items = rvalue.(sfitem_t)
+					sf2.Items = rvalue.(sfitem_t)
 				case "valid":
-					sf.Valid = rvalue.([]string)
+					sf2.Valid = rvalue.([]string)
 				case "group":
-					sf.Group = rvalue.(GroupField_t)
+					sf2.Group = rvalue.(GroupField_t)
 				default:
 					log.Printf(pad+"Unknown Field %s", rkey)
 				}
 			}
+
 			d := data.(map[string]interface{})[key]
 			log.Printf(pad+"  Validate - %s = %+v", k, d)
-			validate(pad, d, sf, k)
+
+			log.Printf(pad+"  sf2 - %s = %+v", k, sf2)
+
+			validate(pad, d, sf2, k)
 		}
 
 	case Schema_t:
