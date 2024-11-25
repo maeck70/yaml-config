@@ -101,6 +101,8 @@ func validate(pad string, data any, schemaField SchemaField_t, key string) {
 
 	case "array":
 		log.Printf(pad+"Array - Config %s = %+v", key, f)
+		checkOptions(data, key, schemaField)
+		log.Printf(pad+"  After %s = %+v", key, getConfigField(config, key))
 
 	case "object":
 		log.Printf(pad+"Object - Config %s = %+v", key, f)
@@ -121,6 +123,24 @@ func getConfigField(config interface{}, key string) interface{} {
 	c := config.(map[string]interface{})
 	cf := c[key]
 	return cf
+}
+
+func checkOptions(data interface{}, schemaFieldKey string, schemaField SchemaField_t) {
+	log.Printf("Check Options %s = %+v", schemaFieldKey, schemaField.Valid)
+	log.Printf("         Data %s = %+v", schemaFieldKey, data.(map[string]interface{})[schemaFieldKey])
+
+	for _, o := range data.(map[string]interface{})[schemaFieldKey].([]interface{}) {
+		f := false
+		for _, v := range schemaField.Valid {
+			if v == o {
+				f = true
+				break
+			}
+		}
+		if !f {
+			log.Fatalf("Option '%s' is not allowed. Valid options: %v", o, schemaField.Valid)
+		}
+	}
 }
 
 func checkField(data interface{}, schemaFieldKey string, schemaField SchemaField_t) {

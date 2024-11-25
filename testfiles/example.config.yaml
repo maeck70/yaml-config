@@ -9,19 +9,20 @@ data:
   City: Walnut Creek
   Id: 123
   State: CA
-  # Options:
-  #   - foo
-  #   - Bar
+  Options:
+    - foo
+    - baz
   Rabbitmq:
     main:
       host: localhost
       user: guest
       password: guest
-      vhost: /
     secondary:
       host: localhost2
       user: willem
       password: waters
+      vhost: /dev
+      weirdfield: ellenven
   # MySql:
   #   host: localhost
   # Redis:
