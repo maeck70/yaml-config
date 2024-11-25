@@ -6,128 +6,98 @@ import (
 
 func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
 	// Validate the config against the schema
-	pad := ""
-	recurValidate(pad, c.Data, cv.Schema, "")
+	recurValidate(c.Data, cv.Schema, "")
 	return nil
 }
 
-func recurValidate(pad string, data any, schema interface{}, key string) {
+func recurValidate(data any, schema interface{}, key string) {
 
 	switch s := schema.(type) {
 
 	case SchemaField_t:
 		// Map of fields
-		log.Printf(pad+"RV - %s = %+v", key, s)
 		for k, v := range s.Attributes {
-			log.Printf(pad+"RV - %s = %+v", k, v)
-			validate(pad, data, v, k)
+			validate(data, v, k)
 		}
 
 	case GroupField_t:
 		// Grouped map of fields
-		log.Printf(pad+"RVGroup - %s = %+v", key, schema)
-
-		csa := s.Attributes
-		log.Printf(pad+"CS - %+v", csa)
 		for k, v := range s.Attributes {
 
-			sf2 := *new(SchemaField_t)
+			sf := *new(SchemaField_t)
 			for rkey, rvalue := range v.(map[string]interface{}) {
-				log.Printf(pad+"rkey %s rvalue - %+v", rkey, rvalue)
-
 				// I know this is stupid, but I can't figure out how to do this properly with reflection
 				switch rkey {
 				case "type":
-					sf2.Type = rvalue.(string)
+					sf.Type = rvalue.(string)
 				case "description":
-					sf2.Description = rvalue.(string)
+					sf.Description = rvalue.(string)
 				case "required":
-					sf2.Required = rvalue.(bool)
+					sf.Required = rvalue.(bool)
 				case "default":
-					sf2.Default = rvalue
+					sf.Default = rvalue
 				case "options":
-					sf2.Options = rvalue.([]any)
+					sf.Options = rvalue.([]any)
 				case "optiontype":
-					sf2.OptionType = rvalue.(string)
+					sf.OptionType = rvalue.(string)
 				case "min":
-					sf2.Min = rvalue.(int)
+					sf.Min = rvalue.(int)
 				case "max":
-					sf2.Max = rvalue.(int)
+					sf.Max = rvalue.(int)
 				case "attributes":
-					sf2.Attributes = rvalue.(map[string]SchemaField_t)
+					sf.Attributes = rvalue.(map[string]SchemaField_t)
 				case "items":
-					sf2.List = rvalue.(map[string]SchemaField_t)
+					sf.List = rvalue.(map[string]SchemaField_t)
 				case "valid":
-					sf2.Valid = rvalue.([]string)
+					sf.Valid = rvalue.([]string)
 				case "group":
-					sf2.Group = rvalue.(GroupField_t)
+					sf.Group = rvalue.(GroupField_t)
 				default:
-					log.Printf(pad+"Unknown Field %s", rkey)
+					log.Printf("Unknown Field %s", rkey)
 				}
 			}
-
 			d := data.(map[string]interface{})[key]
-			log.Printf(pad+"  Validate - %s = %+v", k, d)
-
-			log.Printf(pad+"  sf2 - %s = %+v", k, sf2)
-
-			validate(pad, d, sf2, k)
+			validate(d, sf, k)
 		}
 
 	case Schema_t:
 		for k, v := range s {
-			log.Printf(pad+"RV - %s = %+v", k, v)
-			validate(pad, data, v, k)
+			validate(data, v, k)
 		}
 	default:
-		log.Printf(pad+"Unknown Type %s", schema)
+		log.Printf("Unknown Type %s", schema)
 	}
 }
 
-func validate(pad string, data any, schemaField SchemaField_t, key string) {
+func validate(data any, schemaField SchemaField_t, key string) {
 	config := data.(map[string]interface{})
 	f := getConfigField(config, key)
 
 	switch schemaField.Type {
 	case "string":
-		log.Printf(pad+"String - Config %s = %+v", key, f)
 		checkField(data, key, schemaField)
-		log.Printf(pad+"  After %s = %+v", key, getConfigField(config, key))
 
 	case "integer":
-		log.Printf(pad+"Integer - Config %s = %+v", key, f)
 		checkField(data, key, schemaField)
-		log.Printf(pad+"  After %s = %+v", key, getConfigField(config, key))
 
 	case "boolean":
-		log.Printf(pad+"Boolean - Config %s = %+v", key, f)
 		checkField(data, key, schemaField)
-		log.Printf(pad+"  After %s = %+v", key, getConfigField(config, key))
 
 	case "float":
-		log.Printf(pad+"Float - Config %s = %+v", key, f)
 		checkField(data, key, schemaField)
-		log.Printf(pad+"  After %s = %+v", key, getConfigField(config, key))
 
 	case "array":
-		log.Printf(pad+"Array - Config %s = %+v", key, f)
 		checkOptions(data, key, schemaField)
-		log.Printf(pad+"  After %s = %+v", key, getConfigField(config, key))
 
 	case "map":
-		log.Printf(pad+"Map - Config %s = %+v", key, f)
-
-		for k, v := range f.(map[string]interface{}) {
-			log.Printf(pad+"  Map - %s = %+v", k, v)
-			recurValidate(pad+"  ", f, schemaField.Group, k)
+		for k := range f.(map[string]interface{}) {
+			recurValidate(f, schemaField.Group, k)
 		}
 
 	case "object":
-		log.Printf(pad+"Object - Config %s = %+v", key, f)
-		recurValidate(pad+"  ", f, schemaField, key)
+		recurValidate(f, schemaField, key)
 
 	case "objectlist":
-		log.Printf(pad+"objectlist - Config %s = %+v", key, f)
 		for sk, sv := range schemaField.List {
 			for _, cv := range f.([]interface{}) {
 				checkField(cv, sk, sv)
@@ -135,10 +105,8 @@ func validate(pad string, data any, schemaField SchemaField_t, key string) {
 		}
 
 	default:
-		log.Printf(pad+"Unknown Type %s", schemaField.Type)
+		log.Printf("Unknown Type %s", schemaField.Type)
 	}
-
-	log.Print("")
 }
 
 func getConfigField(config interface{}, key string) interface{} {
@@ -148,9 +116,6 @@ func getConfigField(config interface{}, key string) interface{} {
 }
 
 func checkOptions(data interface{}, schemaFieldKey string, schemaField SchemaField_t) {
-	log.Printf("Check Options %s = %+v", schemaFieldKey, schemaField.Valid)
-	log.Printf("         Data %s = %+v", schemaFieldKey, data.(map[string]interface{})[schemaFieldKey])
-
 	for _, o := range data.(map[string]interface{})[schemaFieldKey].([]interface{}) {
 		f := false
 		for _, v := range schemaField.Valid {
