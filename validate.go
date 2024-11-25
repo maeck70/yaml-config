@@ -56,7 +56,7 @@ func recurValidate(pad string, data any, schema interface{}, key string) {
 				case "attributes":
 					sf2.Attributes = rvalue.(map[string]SchemaField_t)
 				case "items":
-					sf2.Items = rvalue.(sfitem_t)
+					sf2.List = rvalue.(map[string]SchemaField_t)
 				case "valid":
 					sf2.Valid = rvalue.([]string)
 				case "group":
@@ -118,13 +118,21 @@ func validate(pad string, data any, schemaField SchemaField_t, key string) {
 		log.Printf(pad+"Map - Config %s = %+v", key, f)
 
 		for k, v := range f.(map[string]interface{}) {
-			log.Printf(pad+"  Group - %s = %+v", k, v)
+			log.Printf(pad+"  Map - %s = %+v", k, v)
 			recurValidate(pad+"  ", f, schemaField.Group, k)
 		}
 
 	case "object":
 		log.Printf(pad+"Object - Config %s = %+v", key, f)
 		recurValidate(pad+"  ", f, schemaField, key)
+
+	case "objectlist":
+		log.Printf(pad+"Objectlist - Config %s = %+v", key, f)
+		for sk, sv := range schemaField.List {
+			for _, cv := range f.([]interface{}) {
+				checkField(cv, sk, sv)
+			}
+		}
 
 	default:
 		log.Printf(pad+"Unknown Type %s", schemaField.Type)

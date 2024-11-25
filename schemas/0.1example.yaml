@@ -74,26 +74,26 @@ schema:
         description: Port number
         default: 1234
 
-  # Redis:
-  #   type: object
-  #   description: MySql configuration
-  #   List:
-  #     attributes:
-  #       host:
-  #         type: string
-  #         description: Hostname
-  #         required: true
-  #       db:
-  #         type: integer
-  #         description: Database Number
-  #         default: 0
-  #         min: 0
-  #         max: 15
-  # MyArray:
-  #   type: array
-  #   description: List of paths
-  #   List:
-  #     attributes:
-  #       path:
-  #         type: string
-  #         description: Path
+  Redis:
+    type: objectlist
+    description: MySql configuration
+    list:
+      host:
+        type: string
+        description: Hostname
+        required: true
+      db:
+        type: integer
+        description: Database Number
+        default: 0
+        min: 0
+        max: 15
+  
+  MyArray:
+    type: objectlist
+    description: List of paths
+    list:
+      path:
+        type: string
+        description: Path
+        required: true

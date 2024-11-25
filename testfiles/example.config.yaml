@@ -25,12 +25,12 @@ data:
       weirdfield: ellenven
   MySql:
     host: localhost
-  # Redis:
-  #   - host: localhost
-  #     db: 0
-  #   - host: localhost2
-  #     db: 20
-  # MyArray:
-  #   - path: ./path1
-  #   - path: ./path2
-  #   - path: ./path3
+  Redis:
+    - host: localhost
+      db: 0
+    - host: localhost2
+      db: 1
+  MyArray:
+    - path: ./path1
+    - path: ./path2
+    - path: ./path3

@@ -14,8 +14,12 @@ type Mysql_t struct {
 }
 
 type Redis_t struct {
-	Host     string `yaml:"host"`
-	Database int    `yaml:"db"`
+	Host string `yaml:"host"`
+	Db   int    `yaml:"db"`
+}
+
+type Path_t struct {
+	Path string `yaml:"path"`
 }
 
 type myConfig_t struct {
@@ -27,4 +31,5 @@ type myConfig_t struct {
 	Rabbitmq map[string]RabbitMQ_t `yaml:"Rabbitmq"`
 	Mysql    Mysql_t               `yaml:"Mysql"`
 	Redis    []Redis_t             `yaml:"Redis"`
+	MyArray  []Path_t              `yaml:"MyArray"`
 }

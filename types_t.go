@@ -12,8 +12,6 @@ type Config_t struct {
 	Data     interface{} `yaml:"data"`
 }
 
-type sfitem_t []interface{}
-
 // Base Validation Schema
 type ConfigValidator_t struct {
 	Metadata Metadata_t `yaml:"metadata"`
@@ -22,8 +20,6 @@ type ConfigValidator_t struct {
 
 // Schema is the map of fields on that level
 type Schema_t map[string]SchemaField_t
-
-// type Schema_t interface{}
 
 type GroupField_t struct {
 	Type        string                 `yaml:"type"`
@@ -42,7 +38,7 @@ type SchemaField_t struct {
 	Min         int                      `yaml:"min"`
 	Max         int                      `yaml:"max"`
 	Attributes  map[string]SchemaField_t `yaml:"attributes"`
-	Items       sfitem_t                 `yaml:"items"`
+	List        map[string]SchemaField_t `yaml:"list"`
 	Valid       []string                 `yaml:"valid"`
 	Group       GroupField_t             `yaml:"group"`
 }
