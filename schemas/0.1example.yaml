@@ -5,33 +5,34 @@ metadata:
   id: ExampleConfig
   
 schema:
-  # Name:
-  #   type: string
-  #   description: Name of the user
-  #   required: true
-  # City:
-  #   type: string
-  #   description: City of the user
-  #   required: true
-  # State:
-  #   type: string
-  #   description: State of the user
-  #   required: true
-  # Id:
-  #   type: integer
-  #   description: Unique identifier
-  #   required: false
-  #   min: 100
-  #   max: 200    
-  # Options:
-  #   type: array
-  #   description: List of options
-  #   optiontype: string
-  #   required: false
-  #   valid:
-  #     - foo
-  #     - bar
-  #     - baz
+  Name:
+    type: string
+    description: Name of the user
+    required: true
+    default: Bobby
+  City:
+    type: string
+    description: City of the user
+    required: true
+  State:
+    type: string
+    description: State of the user
+    required: true
+  Id:
+    type: integer
+    description: Unique identifier
+    required: false
+    min: 100
+    max: 200    
+  Options:
+    type: array
+    description: List of options
+    optiontype: string
+    required: false
+    valid:
+      - foo
+      - bar
+      - baz
   Rabbitmq:
     type: object
     description: Map of Rabbitmq configurations

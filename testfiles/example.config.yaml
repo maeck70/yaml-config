@@ -5,10 +5,10 @@ metadata:
   id: ExampleConfig
 
 data:
-  # Name: Marcel
-  # City: Walnut Creek
-  # Id: 123
-  # State: CA
+  Name: Marcel
+  City: Walnut Creek
+  Id: 123
+  State: CA
   # Options:
   #   - foo
   #   - Bar
