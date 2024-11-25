@@ -33,7 +33,7 @@ type SchemaField_t struct {
 	Description string                   `yaml:"description"`
 	Required    bool                     `yaml:"required"`
 	Default     any                      `yaml:"default"`
-	Options     []any                    `yaml:"options"`
+	Options     []string                 `yaml:"options"`
 	OptionType  string                   `yaml:"optiontype"`
 	Min         int                      `yaml:"min"`
 	Max         int                      `yaml:"max"`

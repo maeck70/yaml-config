@@ -49,7 +49,7 @@ func parseSchemaField(v map[string]interface{}) SchemaField_t {
 		case "default":
 			sf.Default = rvalue
 		case "options":
-			sf.Options = rvalue.([]any)
+			sf.Options = rvalue.([]string)
 		case "optiontype":
 			sf.OptionType = rvalue.(string)
 		case "min":
