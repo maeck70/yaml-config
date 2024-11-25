@@ -34,7 +34,7 @@ schema:
       - bar
       - baz
   Rabbitmq:
-    type: object
+    type: map
     description: Map of Rabbitmq configurations
     group:
       type: object
@@ -61,18 +61,19 @@ schema:
           description: Virtual host
           default: /
 
-  # MySql:
-  #   type: object
-  #   description: MySql configuration
-  #   attributes:
-  #     host:
-  #       type: string
-  #       description: Hostname
-  #       required: true
-  #     port:
-  #       type: integer
-  #       description: Port number
-  #       default: 1234
+  MySql:
+    type: object
+    description: MySql configuration
+    attributes:
+      host:
+        type: string
+        description: Hostname
+        required: true
+      port:
+        type: integer
+        description: Port number
+        default: 1234
+
   # Redis:
   #   type: object
   #   description: MySql configuration

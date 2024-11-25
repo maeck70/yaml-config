@@ -23,8 +23,8 @@ data:
       password: waters
       vhost: /dev
       weirdfield: ellenven
-  # MySql:
-  #   host: localhost
+  MySql:
+    host: localhost
   # Redis:
   #   - host: localhost
   #     db: 0
