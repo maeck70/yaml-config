@@ -127,7 +127,7 @@ func validate(pad string, data any, schemaField SchemaField_t, key string) {
 		recurValidate(pad+"  ", f, schemaField, key)
 
 	case "objectlist":
-		log.Printf(pad+"Objectlist - Config %s = %+v", key, f)
+		log.Printf(pad+"objectlist - Config %s = %+v", key, f)
 		for sk, sv := range schemaField.List {
 			for _, cv := range f.([]interface{}) {
 				checkField(cv, sk, sv)
