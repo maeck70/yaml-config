@@ -8,7 +8,7 @@ func TestYamlConfig(t *testing.T) {
 	myc := myConfig_t{}
 
 	// simple test of LoadConfig()
-	c := LoadConfig("testfiles/example.config.yaml", &myc)
+	c := LoadConfig("./testfiles/example.config.yaml", &myc, "./schemas")
 	newConf := c.(*myConfig_t)
 	if newConf.Name != "MyName" {
 		t.Errorf("MyConf: %+v\n", newConf)

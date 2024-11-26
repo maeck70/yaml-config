@@ -83,7 +83,7 @@ func getSchema(schemaFile string, schemaPath []string) ConfigValidator_t {
 	)
 
 	// Check if version is in schemaMap, if so return it
-	if sm, ok := schemaMap[schemaFile]; !ok {
+	if sm, ok := schemaMap[schemaFile]; ok {
 		return sm
 	}
 
@@ -112,6 +112,9 @@ func getSchema(schemaFile string, schemaPath []string) ConfigValidator_t {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+
+	// Save in cache
+	schemaMap[schemaFile] = schema
 
 	return schema
 }
