@@ -3,14 +3,6 @@ metadata:
   id: TwistyGo_Orchestrator_Workflow
 
 schema:
-  id:
-    type: string
-    description: Unique identifier for the workflow
-    required: true
-  schema_version:
-    type: string
-    description: Version of the schema
-    required: true
   name:
     type: string
     description: Name of the workflow
@@ -25,89 +17,89 @@ schema:
     required: false
 
   initiate:
-    type: array
+    type: objectlist
     description: List of paths to initiate
-    items:
-      type: string
-      description: Path to initiate
-      required: true
+    required: true
+    list:
+      path:
+        type: string
+        description: Initiate Path
 
   twisty-services:
-    type: object
-    description: List of TwistyGo Services
-    attributes:
-      ServiceName:
-        type: object
-        description: A Service
-        attributes:
-          queue:
-            type: string
-            description: Queue name
-            required: true
-          exchange:
-            type: string
-            description: Exchange name
-            required: true
-          routingkey:
-            type: string
-            description: Routing key
-            required: true
+    type: map
+    description: Map of TwistyGo Services
+    group:
+      type: object
+      description: Map of TwistyGo Service Definitions
+      attributes:
+        queue:
+          type: string
+          description: Queue name
+          required: true
+        exchange:
+          type: string
+          description: Exchange name
+          required: true
+        routingkey:
+          type: string
+          description: Routing key
+          required: true
 
-  paths:
-    type: object
-    description: List of Paths
-    attributes:
-      PathName:
-        type: object
-        description: A Path
-        attributes:
-          description:
-            type: string
-            description: Description of the path
-            required: true
-          type:
-            type: string
-            description: Type of path
-            required: true
-          firststep:
-            type: string
-            description: First step in the path
-            required: true
-          steps:
-            type: object
-            description: List of Steps
-            attributes:
-              StepName:
-                type: object
-                description: A Step
-                attributes:
-                  description:
-                    type: string
-                    description: Description of the step
-                    required: true
-                  type:
-                    type: string
-                    description: Type of step
-                    required: true
-                  command:
-                    type: string
-                    description: Command to execute
-                    required: true
-                  timeout:
-                    type: string
-                    description: Timeout for the step
-                    required: true
-                  next:
-                    type: array
-                    description: Next steps
-                    items:
-                      type: object
-                      attributes:
-                        step:
-                          type: string
-                          description: Next step
-                          required: true
-                        branch:
-                          type: string
-                          description: Branch to take
-                          required: false
+  # paths:
+  #   type: object
+  #   description: List of Paths
+  #   attributes:
+  #     PathName:
+  #       type: object
+  #       description: A Path
+  #       attributes:
+  #         description:
+  #           type: string
+  #           description: Description of the path
+  #           required: true
+  #         type:
+  #           type: string
+  #           description: Type of path
+  #           required: true
+  #         firststep:
+  #           type: string
+  #           description: First step in the path
+  #           required: true
+  #         steps:
+  #           type: object
+  #           description: List of Steps
+  #           attributes:
+  #             StepName:
+  #               type: object
+  #               description: A Step
+  #               attributes:
+  #                 description:
+  #                   type: string
+  #                   description: Description of the step
+  #                   required: true
+  #                 type:
+  #                   type: string
+  #                   description: Type of step
+  #                   required: true
+  #                 command:
+  #                   type: string
+  #                   description: Command to execute
+  #                   required: true
+  #                 timeout:
+  #                   type: string
+  #                   description: Timeout for the step
+  #                   required: true
+  #                 next:
+  #                   type: array
+  #                   description: Next steps
+  #                   items:
+  #                     type: object
+  #                     attributes:
+  #                       step:
+  #                         type: string
+  #                         description: Next step
+  #                         required: true
+  #                       branch:
+  #                         type: string
+  #                         description: Branch to take
+  #                         required: false

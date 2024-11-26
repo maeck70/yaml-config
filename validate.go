@@ -72,33 +72,41 @@ func parseSchemaField(v map[string]interface{}) SchemaField_t {
 }
 
 func validate(data any, schemaField SchemaField_t, key string) {
-	config := data.(map[string]interface{})
-	f := getConfigField(config, key)
 
-	switch schemaField.Type {
-	case "string", "integer", "boolean", "float":
-		checkField(data, key, schemaField)
+	// check if the data field in the config file has any data
+	switch config := data.(type) {
 
-	case "array":
-		checkOptions(data, key, schemaField)
+	case map[string]interface{}:
+		f := getConfigField(config, key)
 
-	case "map":
-		for k := range f.(map[string]interface{}) {
-			recurValidate(f, schemaField.Group, k)
-		}
+		switch schemaField.Type {
+		case "string", "integer", "boolean", "float":
+			checkField(data, key, schemaField)
 
-	case "object":
-		recurValidate(f, schemaField, key)
+		case "array":
+			checkOptions(data, key, schemaField)
 
-	case "objectlist":
-		for _, cv := range f.([]interface{}) {
-			for sk, sv := range schemaField.List {
-				checkField(cv, sk, sv)
+		case "map":
+			for k := range f.(map[string]interface{}) {
+				recurValidate(f, schemaField.Group, k)
 			}
+
+		case "object":
+			recurValidate(f, schemaField, key)
+
+		case "objectlist":
+			for _, cv := range f.([]interface{}) {
+				for sk, sv := range schemaField.List {
+					checkField(cv, sk, sv)
+				}
+			}
+
+		default:
+			log.Printf("Unknown Type %s", schemaField.Type)
 		}
 
 	default:
-		log.Printf("Unknown Type %s", schemaField.Type)
+		log.Fatal("Config file has an invalid data block")
 	}
 }
 
