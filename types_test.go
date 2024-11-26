@@ -28,6 +28,7 @@ type myConfig_t struct {
 	Name     string                `yaml:"Name"`
 	City     string                `yaml:"City"`
 	State    string                `yaml:"State"`
+	Timeout  time.Duration         `yaml:"Timeout"`
 	Id       int                   `yaml:"Id"`
 	Options  []string              `yaml:"Options"`
 	Rabbitmq map[string]RabbitMQ_t `yaml:"Rabbitmq"`
@@ -43,9 +44,9 @@ type Workflow_t struct {
 	Name          string                        `yaml:"name"`
 	Description   string                        `yaml:"description"`
 	Version       string                        `yaml:"version"`
-	InitiatePaths []WorkflowInitiate_t          `yaml:"initiate"`
-	Behaviors     map[string]WorkflowBehavior_t `yaml:"paths"`
-	Services      map[string]TwistyService_t    `yaml:"twisty-services"`
+	InitiatePaths []WorkflowInitiate_t          `yaml:"initiatepaths"`
+	Behaviors     map[string]WorkflowBehavior_t `yaml:"behaviors"`
+	Services      map[string]TwistyService_t    `yaml:"services"`
 }
 
 type WorkflowInitiate_t struct {
@@ -60,12 +61,12 @@ type WorkflowPath_t struct {
 }
 
 type WorkflowBehavior_t struct {
-	Name        string                     `yaml:"name"`
-	Description string                     `yaml:"description"`
-	PathType    string                     `yaml:"type"`
-	FirstStep   string                     `yaml:"firststep"`
-	Steps       map[string]WorkflowStep_t  `yaml:"steps"`
-	Services    map[string]TwistyService_t `yaml:"services"`
+	Name         string                     `yaml:"name"`
+	Description  string                     `yaml:"description"`
+	BehaviorType string                     `yaml:"behaviortype"`
+	FirstStep    string                     `yaml:"firststep"`
+	Steps        map[string]WorkflowStep_t  `yaml:"steps"`
+	Services     map[string]TwistyService_t `yaml:"services"`
 }
 
 type WorkflowStep_t struct {
@@ -77,12 +78,13 @@ type WorkflowStep_t struct {
 	Command       string                `yaml:"command"` // Only Valid in workflow-service --- Does this have any use?
 	Parameters    map[string]string     `yaml:"parameters"`
 	WaitFor       []string              `yaml:"waitfor"` // Only Valid in workflow-merge
-	TimeoutStr    string                `yaml:"timeout"` // eg. 200ms, 10s, 5m  Will be converted to int (miliseconds) in the code
-	Timeout       time.Duration         `yaml:"-"`
+	Timeout       time.Duration         `yaml:"timeout"` // eg. 200ms, 10s, 5m  Will be converted to int (miliseconds) in the code
 	Exception     string                `yaml:"exception"`
 	Queue         string                `yaml:"queue"` // Only Valid in workflow-service
 	Next          []WorkflowNext_t      `yaml:"next"`
 	MergeStrategy []MergeStrategyFunc_t `yaml:"mergestrategy"`
+	// TimeoutStr    string                `yaml:"timeout"` // eg. 200ms, 10s, 5m  Will be converted to int (miliseconds) in the code
+	// Timeout       time.Duration         `yaml:"-"`
 }
 
 type WorkflowNext_t struct {

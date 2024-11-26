@@ -18,6 +18,10 @@ schema:
     type: string
     description: State of the user
     required: true
+  Timeout:
+    type: timeduration
+    description: Time Duration Test string to int
+    default: 250ms
   Id:
     type: integer
     description: Unique identifier

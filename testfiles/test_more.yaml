@@ -7,52 +7,52 @@ metadata:
 data:
   name: testwf02
   description: This is a set of test workflows
-  version: 1.0
+  version: 1.2
 
-  initiate:
+  initiatepaths:
     - path: broadpath
 
-  twisty-services:
+  services:
     Example01:
       queue: Example01Topic
       exchange: twistyservices
       routingkey: example01
-    Example02:
-      queue: Example02Topic
-      exchange: twistyservices
-      routingkey: example02
-    Example03:
-      queue: Example03Topic
-      exchange: twistyservices
-      routingkey: example03
-    Example04:
-      queue: Example04Topic
-      exchange: twistyservices
-      routingkey: example04
-    Example05:
-      queue: Example05Topic
-      exchange: twistyservices
-      routingkey: example05
-    Example06:
-      queue: Example06Topic
-      exchange: twistyservices
-      routingkey: example06
-    Example07:
-      queue: Example07Topic
-      exchange: twistyservices
-      routingkey: example07
+  #   Example02:
+  #     queue: Example02Topic
+  #     exchange: twistyservices
+  #     routingkey: example02
+  #   Example03:
+  #     queue: Example03Topic
+  #     exchange: twistyservices
+  #     routingkey: example03
+  #   Example04:
+  #     queue: Example04Topic
+  #     exchange: twistyservices
+  #     routingkey: example04
+  #   Example05:
+  #     queue: Example05Topic
+  #     exchange: twistyservices
+  #     routingkey: example05
+  #   Example06:
+  #     queue: Example06Topic
+  #     exchange: twistyservices
+  #     routingkey: example06
+  #   Example07:
+  #     queue: Example07Topic
+  #     exchange: twistyservices
+  #     routingkey: example07
 
-  paths:
+  behaviors:
     broadpath:
       description: This is a broad path, 8 services in parallel and merge them at the end.
-      type: path
+      behaviortype: path
       firststep: step1
       steps:
         step1:
           description: Step before we go parallel
-          type: twistygo-service
+          pathtype: twistygo-service
           command: Example01
-          timeout: 1.5s
+          timeout: 15
           next: 
             - step: step2a
               branch: branch-2a
@@ -69,67 +69,67 @@ data:
           description: Parallel step 2a
           type: twistygo-service
           command: Example02
-          timeout: 250ms
+          timeout: 250
           next: 
             - step: merge
 
-        step2b:
-          description: Parallel step 2b
-          type: twistygo-service
-          command: Example03
-          timeout: 250ms
-          next: 
-            - step: merge
+        # step2b:
+        #   description: Parallel step 2b
+        #   type: twistygo-service
+        #   command: Example03
+        #   timeout: 250ms
+        #   next: 
+        #     - step: merge
 
-        step2c:
-          description: Parallel step 2c
-          type: twistygo-service
-          command: Example04
-          timeout: 250ms
-          next: 
-            - step: merge
+        # step2c:
+        #   description: Parallel step 2c
+        #   type: twistygo-service
+        #   command: Example04
+        #   timeout: 250ms
+        #   next: 
+        #     - step: merge
 
-        step2d:
-          description: Parallel step 2d
-          type: twistygo-service
-          command: Example05
-          timeout: 250ms
-          next: 
-            - step: merge
+        # step2d:
+        #   description: Parallel step 2d
+        #   type: twistygo-service
+        #   command: Example05
+        #   timeout: 250ms
+        #   next: 
+        #     - step: merge
 
-        step2e:
-          description: Parallel step 2e
-          type: twistygo-service
-          command: Example06
-          timeout: 250ms
-          next: 
-            - step: merge
+        # step2e:
+        #   description: Parallel step 2e
+        #   type: twistygo-service
+        #   command: Example06
+        #   timeout: 250ms
+        #   next: 
+        #     - step: merge
 
-        merge:
-          description: This is the merge step
-          type: workflow-merge
-          waitfor:
-            - branch-2a
-            - branch-2b
-            - branch-2c
-            - branch-2d
-            - branch-2e
-          mergestrategy: 
-            - action: concat
-              field: message
-            - action: add
-              field: aggregate
-            - action: latest
-              field: timestamp
-          timeout: 10s
-          # exception: merge_exception
-          next: 
-            - step: final
+        # merge:
+        #   description: This is the merge step
+        #   type: workflow-merge
+        #   waitfor:
+        #     - branch-2a
+        #     - branch-2b
+        #     - branch-2c
+        #     - branch-2d
+        #     - branch-2e
+        #   mergestrategy: 
+        #     - action: concat
+        #       field: message
+        #     - action: add
+        #       field: aggregate
+        #     - action: latest
+        #       field: timestamp
+        #   timeout: 10s
+        #   # exception: merge_exception
+        #   next: 
+        #     - step: final
 
-        final:
-          description: Final step
-          type: twistygo-service
-          command: Example07
-          timeout: 250ms
-          next: 
-            - step: exit
+        # final:
+        #   description: Final step
+        #   type: twistygo-service
+        #   command: Example07
+        #   timeout: 250ms
+        #   next: 
+        #     - step: exit

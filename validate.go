@@ -1,7 +1,9 @@
 package yamlconfig
 
 import (
+	"fmt"
 	"log"
+	"time"
 )
 
 func (cv ConfigValidator_t) validateConfig(c *Config_t) error {
@@ -61,7 +63,19 @@ func parseSchemaField(v map[string]interface{}) SchemaField_t {
 		case "items":
 			sf.List = rvalue.(map[string]SchemaField_t)
 		case "valid":
-			sf.Valid = rvalue.([]string)
+			switch rv := rvalue.(type) {
+			case []string:
+				sf.Valid = rv
+			case interface{}:
+				for _, v := range rv.([]interface{}) {
+					switch valid := v.(type) {
+					case string:
+						sf.Valid = append(sf.Valid, valid)
+					}
+				}
+			default:
+				log.Fatalf("Unknown type for 'valid' %v ", rvalue)
+			}
 		case "group":
 			sf.Group = rvalue.(GroupField_t)
 		default:
@@ -80,15 +94,20 @@ func validate(data any, schemaField SchemaField_t, key string) {
 		f := getConfigField(config, key)
 
 		switch schemaField.Type {
-		case "string", "integer", "boolean", "float":
+		case "string", "integer", "boolean", "float", "timeduration":
 			checkField(data, key, schemaField)
 
 		case "array":
 			checkOptions(data, key, schemaField)
 
 		case "map":
-			for k := range f.(map[string]interface{}) {
-				recurValidate(f, schemaField.Group, k)
+			switch f := f.(type) {
+			case map[string]interface{}:
+				for k := range f {
+					recurValidate(f, schemaField.Group, k)
+				}
+			default:
+				log.Fatalf("Field %s is not a map", key)
 			}
 
 		case "object":
@@ -154,6 +173,58 @@ func checkField(data interface{}, schemaFieldKey string, schemaField SchemaField
 		if (schemaField.Min > 0 && val < schemaField.Min) || (schemaField.Max > 0 && val > schemaField.Max) {
 			log.Fatalf("Error on field %s: value %d is out of range [%d, %d].\n",
 				schemaFieldKey, val, schemaField.Min, schemaField.Max)
+		}
+	case "string":
+		switch v := value.(type) {
+
+		case string:
+			// No conversion needed
+
+		case float64:
+			config[schemaFieldKey] = fmt.Sprintf("%0.2f", v)
+
+		case float32:
+			config[schemaFieldKey] = fmt.Sprintf("%0.2f", v)
+
+		case int:
+			config[schemaFieldKey] = fmt.Sprintf("%d", v)
+
+		default:
+			log.Fatal("Invalid type for checkField with type string field")
+		}
+
+	case "timeduration":
+		switch v := value.(type) {
+
+		case time.Duration:
+			// No conversion needed
+
+		case string:
+			d, err := time.ParseDuration(v)
+			if err != nil {
+				log.Fatalf("Error parsing timeduration value %s: %s", v, err)
+			}
+			config[schemaFieldKey] = d
+
+		default:
+			log.Fatal("Invalid type for checkField with type timeduration field")
+
+		}
+	}
+
+	// Check field against its valid options
+	if schemaField.Valid != nil {
+		switch v := value.(type) {
+		case string:
+			for _, vo := range schemaField.Valid {
+				if vo == v {
+					return
+				}
+			}
+			log.Fatalf("%s is not a valid option for field %s", config[schemaFieldKey], schemaFieldKey)
+
+		default:
+			log.Fatalf("Unkown type for checking valid options. Supported: string")
 		}
 	}
 }

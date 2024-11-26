@@ -1,6 +1,7 @@
 package yamlconfig
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -70,9 +71,28 @@ func LoadConfig(file string, customStruct interface{}, schemaPath ...string) any
 	schema.validateConfig(configStruct)
 
 	// Convert the map structure back to the original struct
+
+	// prettyPrint(configStruct, "ConfigStruct")
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
-	mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
+	err = mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	prettyPrint(res, "Result")
 	return res
+}
+
+func prettyPrint(s interface{}, n string) {
+	log.Print("=======================================================================================")
+	log.Printf("===> %s out: %+v", n, s)
+
+	data, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	log.Printf("%s out:", n)
+	log.Print(string(data))
 }
 
 func getSchema(schemaFile string, schemaPath []string) ConfigValidator_t {

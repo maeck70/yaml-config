@@ -16,7 +16,7 @@ schema:
     description: Version of the workflow
     required: false
 
-  initiate:
+  initiatepaths:
     type: objectlist
     description: List of paths to initiate
     required: true
@@ -25,7 +25,7 @@ schema:
         type: string
         description: Initiate Path
 
-  twisty-services:
+  services:
     type: map
     description: Map of TwistyGo Services
     group:
@@ -45,61 +45,87 @@ schema:
           description: Routing key
           required: true
 
-  # paths:
-  #   type: object
-  #   description: List of Paths
-  #   attributes:
-  #     PathName:
-  #       type: object
-  #       description: A Path
-  #       attributes:
-  #         description:
-  #           type: string
-  #           description: Description of the path
-  #           required: true
-  #         type:
-  #           type: string
-  #           description: Type of path
-  #           required: true
-  #         firststep:
-  #           type: string
-  #           description: First step in the path
-  #           required: true
-  #         steps:
-  #           type: object
-  #           description: List of Steps
-  #           attributes:
-  #             StepName:
-  #               type: object
-  #               description: A Step
-  #               attributes:
-  #                 description:
-  #                   type: string
-  #                   description: Description of the step
-  #                   required: true
-  #                 type:
-  #                   type: string
-  #                   description: Type of step
-  #                   required: true
-  #                 command:
-  #                   type: string
-  #                   description: Command to execute
-  #                   required: true
-  #                 timeout:
-  #                   type: string
-  #                   description: Timeout for the step
-  #                   required: true
-  #                 next:
-  #                   type: array
-  #                   description: Next steps
-  #                   items:
-  #                     type: object
-  #                     attributes:
-  #                       step:
-  #                         type: string
-  #                         description: Next step
-  #                         required: true
-  #                       branch:
-  #                         type: string
-  #                         description: Branch to take
-  #                         required: false
+  behaviors:
+    type: map
+    description: List of Behaviors      
+    group:
+      type: object
+      description: Behavior
+      attributes:
+        description:
+          behaviortype: string
+          description: Description of the path
+          required: false
+        behaviortype:
+          type: string
+          description: Path type
+          required: true
+          valid:
+            - path
+
+        # firststep: 
+        #   type: string
+        #   description: First step in the path
+        #   required: true
+        # steps:
+        #   type: map
+        #   attributes:
+        #     PathName:
+        #       type: object
+        #       description: A Path
+
+              # attributes:
+              #   description:
+              #     type: string
+              #     description: Description of the path
+              #     required: true
+              #   type:
+              #     type: string
+              #     description: Type of path
+              #     required: true
+              # valid: 
+              #   - twistygo-service
+              #   - workflow-merge
+
+              #   firststep:
+              #     type: string
+              #     description: First step in the path
+              #     required: true
+              #   steps:
+              #     type: object
+              #     description: List of Steps
+              #     attributes:
+              #       StepName:
+              #         type: object
+              #         description: A Step
+              #         attributes:
+              #           description:
+              #             type: string
+              #             description: Description of the step
+              #             required: true
+              #           type:
+              #             type: string
+              #             description: Type of step
+              #             required: true
+              #           command:
+              #             type: string
+              #             description: Command to execute
+              #             required: true
+              #           timeout:
+              #             type: timeduration
+              #             description: Timeout for the step (number in ms, or use a string like 10s)
+              #             required: true
+              #           next:
+              #             type: array
+              #             description: Next steps
+              #             items:
+              #               type: object
+              #               attributes:
+              #                 step:
+              #                   type: string
+              #                   description: Next step
+              #                   required: true
+              #                 branch:
+              #                   type: string
+              #                   description: Branch to take
+              #                   required: false
