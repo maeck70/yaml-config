@@ -1,7 +1,7 @@
 package yamlconfig
 
 import (
-	"embed"
+	"fmt"
 	"log"
 	"os"
 	"reflect"
@@ -10,8 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed schemas/*.yaml
-var schemaDir embed.FS
+var schemaMap = make(map[string]ConfigValidator_t)
 
 // LoadConfig reads a YAML configuration file and loads it into a custom struct.
 // It returns a map representation of the configuration.
@@ -19,10 +18,11 @@ var schemaDir embed.FS
 // Parameters:
 // - file: The path to the YAML configuration file.
 // - customStruct: A pointer to the custom struct where the configuration will be loaded.
+// - schemaPath: The path to the schema file. Multiple paths can be provided in an array.
 //
 // Returns:
 // - A map representation of the configuration.
-func LoadConfig(file string, customStruct interface{}) any {
+func LoadConfig(file string, customStruct interface{}, schemaPath ...string) any {
 
 	// Build the full config struct
 	dataStruct := reflect.ValueOf(customStruct)
@@ -47,21 +47,10 @@ func LoadConfig(file string, customStruct interface{}) any {
 		log.Fatalf("error: %v", err)
 	}
 
-	// If the schema definition file (schema_version) does not exist, we dont support it
-	schemadata, err := schemaDir.ReadFile("schemas/" + datameta.Metadata.SchemaVersion + ".yaml")
-	if err != nil {
-		log.Fatalf("Schema version %s is not supported in file %s", datameta.Metadata.SchemaVersion, file)
-	}
+	schema := getSchema(datameta.Metadata.SchemaVersion, schemaPath)
 
 	// Unmarshal the config schema
 	err = yaml.Unmarshal(data, configStruct)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-
-	// Unmarshal the validation schema
-	schema := ConfigValidator_t{}
-	err = yaml.Unmarshal(schemadata, &schema)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -84,4 +73,45 @@ func LoadConfig(file string, customStruct interface{}) any {
 	res := reflect.New(reflect.TypeOf(customStruct).Elem()).Interface()
 	mapstructure.Decode(configStruct.Data.(map[string]interface{}), &res)
 	return res
+}
+
+func getSchema(schemaFile string, schemaPath []string) ConfigValidator_t {
+	var (
+		err        error
+		schemaData []byte
+		file       string
+	)
+
+	// Check if version is in schemaMap, if so return it
+	if sm, ok := schemaMap[schemaFile]; !ok {
+		return sm
+	}
+
+	// Scan the folders for the schema file
+	for _, sp := range schemaPath {
+		// If the schema definition file (schema_version) does not exist, we dont support it
+		file = fmt.Sprintf("%s/%s.yaml", sp, schemaFile)
+		schemaData, err = os.ReadFile(file)
+		if err != nil {
+			switch err {
+			case os.ErrNotExist:
+				continue
+			default:
+				log.Fatalf("Schema version %s is not supported in file %s", schemaFile, file)
+			}
+		}
+	}
+
+	if schemaData == nil {
+		log.Fatalf("Schema file %s not found", file)
+	}
+
+	// Unmarshal the validation schema
+	schema := ConfigValidator_t{}
+	err = yaml.Unmarshal(schemaData, &schema)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	return schema
 }
