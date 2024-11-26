@@ -1,30 +1,70 @@
 package yamlconfig
 
 import (
+	"reflect"
 	"testing"
 )
 
 func TestYamlConfig(t *testing.T) {
+
 	myc := myConfig_t{}
+
+	res := myConfig_t{
+		Name:    "Marcel",
+		City:    "Walnut Creek",
+		State:   "CA",
+		Id:      123,
+		Options: []string{"foo", "baz"},
+		Rabbitmq: map[string]RabbitMQ_t{
+			"main":      {Host: "localhost", Port: 5672, User: "guest", Password: "guest", Vhost: "/"},
+			"secondary": {Host: "localhost2", Port: 5672, User: "willem", Password: "waters", Vhost: "/dev"},
+		},
+		Mysql: Mysql_t{
+			Host: "localhost",
+			Port: 1234,
+		},
+		Redis: []Redis_t{
+			{Host: "localhost", Db: 0},
+			{Host: "localhost2", Db: 1},
+		},
+		MyArray: []Path_t{
+			{Path: "./path1"},
+			{Path: "./path2"},
+			{Path: "./path3"},
+		},
+	}
 
 	// simple test of LoadConfig()
 	c := LoadConfig("./testfiles/example.config.yaml", &myc, "./schemas")
 	newConf := c.(*myConfig_t)
-	if newConf.Name != "MyName" {
+	if !equalStructs(newConf, &res) {
 		t.Errorf("MyConf: %+v\n", newConf)
+		t.Errorf("Expected: %+v\n", res)
 	}
 }
 
-/*
-func equal(a, b map[string]interface{}) bool {
-	if len(a) != len(b) {
+func equalStructs(a, b interface{}) bool {
+	aValue := reflect.ValueOf(a)
+	bValue := reflect.ValueOf(b)
+
+	if aValue.Kind() != bValue.Kind() {
 		return false
 	}
-	for k, v := range a {
-		if b[k] != v {
+
+	if aValue.Kind() == reflect.Ptr {
+		aValue = aValue.Elem()
+		bValue = bValue.Elem()
+	}
+
+	if aValue.Kind() != reflect.Struct {
+		return false
+	}
+
+	for i := 0; i < aValue.NumField(); i++ {
+		if !reflect.DeepEqual(aValue.Field(i).Interface(), bValue.Field(i).Interface()) {
 			return false
 		}
 	}
+
 	return true
 }
-*/
