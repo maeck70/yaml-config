@@ -60,7 +60,8 @@ Here's an example schema structure:
 ```yaml
 # schema.yaml
 metadata:
-  version: 0.1alpha
+  schema_version: schema
+  id: ExampleConfig
 schema:
   Name:
     type: string
@@ -132,7 +133,8 @@ Here's an example schema structure:
 # uses example.schema.yaml
 
 metadata:
-  schema: example.schema.yaml
+  schema_version: schema
+  id: ExampleConfig
 data:
   Name: William
   City: New York
